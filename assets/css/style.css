@@ -1,0 +1,166 @@
+/* Import Google font - Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+/* Overlay for the semi-blur and dark effect start */
+.loading-overlay {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(122, 126, 134, 0.5); /* Dark semi-transparent background */
+    backdrop-filter: blur(6px); /* Blur effect */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Ensure it is above all other content */
+  }
+  
+  /* Loader styling */
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50vh;
+  }
+  
+  
+  .dot {
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    /* background-color: #f57100; */
+    border-radius: 50%;
+    animation: bounce 0.9s infinite ease-in-out both;
+  }
+  
+  .dot:nth-child(1) {
+    animation-delay: -0.24s;
+    background-color: #f57100;
+  }
+  
+  .dot:nth-child(2) {
+    animation-delay: -0.12s;
+    background-color: #1a30f3;
+  
+  }
+  
+  .dot:nth-child(3) {
+    animation-delay: 0;
+    background-color: #f57100;
+  
+  }
+  
+  .dot:nth-child(4) {
+    animation-delay: 0.12s;
+    background-color: #1a30f3;
+  
+  }
+  
+  .dot:nth-child(5) {
+    animation-delay: 0.24s;
+    background-color: #f57100;
+  
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+  }
+  
+  /* Loading text styling */
+  .loading-text {
+    margin-top: 0px;
+    color: var(--black-color);
+    font-size: 1.2em;
+    font-weight: 500;
+    text-align: center;
+  }
+  /* Overlay Style end */
+/* button spinner */
+  .spinner-border {
+    display: none;
+}
+/* login form */
+.center-form {
+    display: flex;
+    justify-content: center;
+}
+
+.login-container {
+    background-color: rgb(255, 255, 255);
+    margin: 0 30px;
+    padding: 20px 50px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.171);
+    width: 400px;
+}
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.login-container input[type="text"],
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px ;
+    margin-bottom: 10px ;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.login-container button:hover {
+    background-color: #218838;
+}
+.login-container .error {
+    color: red;
+    margin-bottom: 10px;
+    text-align: center;
+}
+/* login form end*/
+/* dashboard page */
+.dashboard-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.dashboard-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.admin-panel, .user-panel {
+  display: none;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+/* dashboard page end*/

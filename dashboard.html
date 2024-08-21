@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <title>Dashboard</title>
+</head>
+<body>
+
+    <!-- loader start -->
+  <div id="loading-overlay" class="loading-overlay" style="display: none;">
+    <div class="loader">
+    <!-- <div class="text">Please wait</div> -->
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="loading-text" id="loadingText">--Please wait--</div>
+  </div>
+  <!-- Loader end -->
+
+
+    <div class="dashboard-container">
+        <h2>Welcome to the Dashboard</h2>
+        <div id="adminPanel" class="admin-panel">
+            <h3>Admin Panel</h3>
+            <p>Only accessible to Admins.</p>
+        </div>
+        <div id="userPanel" class="user-panel">
+            <h3>User Panel</h3>
+            <p>Accessible to all users.</p>
+        </div>
+        <button id="logoutBtn">Logout</button>
+    </div>
+<!-- JavaScript -->
+<script src="assets/js/script.js"></script>
+    <script>
+    // console.log(sessionToken);
+    // console.log(userRole);
+    if (userRole === 'Admin') {
+        document.getElementById('adminPanel').style.display = 'block';
+    }
+    document.getElementById('userPanel').style.display = 'block';
+    
+    </script>
+</body>
+</html>
