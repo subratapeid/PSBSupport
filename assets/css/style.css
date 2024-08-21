@@ -12,7 +12,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: auto;
 }
 /* Overlay for the semi-blur and dark effect start */
 .loading-overlay {
@@ -107,10 +107,12 @@
 
 .login-container {
     background-color: rgb(255, 255, 255);
-    margin: 0 30px;
-    padding: 20px 50px;
+    position: relative;
+    top: 50px;
+    margin: 0 10px;
+    padding: 20px 30px;
     border-radius: 8px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.171);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.171);
     width: 400px;
 }
 .login-container h2 {
