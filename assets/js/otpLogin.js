@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const validateOtpBtn = document.getElementById('validateOtpBtn');
 
     const otpArea = document.getElementById('otpArea');
-    otpArea.style.display = 'none';
+    // otpArea.style.display = 'none';
 
 
     let countdownInterval;
@@ -133,10 +133,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.status === 'success') {
                 localStorage.setItem('sessionToken', data.sessionToken);
-                localStorage.setItem('role', data.role);
-                console.log(data.sessionToken);
-                console.log(data.role);
-                
+                localStorage.setItem('userRole', data.userRole);
+                // console.log(data.sessionToken);
+                // console.log(data.userRole);
+                window.location.href = 'dashboard.html';
                 // alert("OTP verified successfully. You are logged in!");
                 toastr.success("OTP verified successfully. You are logged in!");
             } else if (data.status === 'expired' || data.attemptsLeft == 0) {
@@ -191,9 +191,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check for debug
     // const otpToken = localStorage.getItem('otpToken');
     // const sessionToken = localStorage.getItem('sessionToken');
-    // const role = localStorage.getItem('role');
+    // const userRole = localStorage.getItem('userRole');
     // console.log(sessionToken);
-    // console.log(role);
+    // console.log(userRole);
     // console.log(otpToken);
 
 });

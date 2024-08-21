@@ -1,3 +1,4 @@
+
 // overlay loading start
 const loadingDiv= document.getElementById('loading-overlay');
 const loadingText= document.getElementById('loadingText');
@@ -69,25 +70,34 @@ function clearItem(name) {
 }
 
 
-    showOverlay('--Please Wait--');
-    const sessionToken = getItem('sessionToken');
-    const userRole = getItem('userRole');
-    function checkUserRole() {
+    // showOverlay('--Please Wait--');
+    const sessionToken = localStorage.getItem('sessionToken');
+    const userRole = localStorage.getItem('userRole');
+
+    function checkUserRole(page, sessionToken, userRole) {
         if (!sessionToken || !userRole) {
             window.location.href = 'index.html';
             return;       
         }
-    fetch(`https://script.google.com/macros/s/AKfycbw5_DWeGtUZ8rjVukvAddNRLbrXnEPovlC6FSyyIjSg1ova1YzJ0uX07pgniR29OGBlBA/exec?action=validateRole&sessionToken=${encodeURIComponent(sessionToken)}&role=${encodeURIComponent(userRole)}`)
-        .then(response => response.json())
-        .then(data => {
-            hideOverlay();
-            if (!data.success) {
-                alert(data.message);
-                logout();
-            } else {}
-        })
+        console.log(sessionToken);
+        console.log(userRole);
+        console.log(page);
+        return 'Superadmin';
+    // fetch(`https://script.google.com/macros/s/AKfycbw5_DWeGtUZ8rjVukvAddNRLbrXnEPovlC6FSyyIjSg1ova1YzJ0uX07pgniR29OGBlBA/exec?action=validateRole&sessionToken=${encodeURIComponent(sessionToken)}&role=${encodeURIComponent(userRole)}`)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         hideOverlay();
+    //         if (!data.success) {
+    //             alert(data.message);
+    //             logout();
+    //         } else {}
+    //     })
     }
-    checkUserRole();
+
+// check the user role from each page like thevin bellow
+// checkUserRole('dashboard', sessionToken, userRole);
+
+
 // loggout code
 let logoutBtn = document.getElementById('logoutBtn');
 
@@ -102,3 +112,10 @@ function logout() {
         history.replaceState(null, null, 'index.html');
         window.location.href = 'index.html';
 }
+
+    // console.log(sessionToken);
+    // console.log(userRole);
+    // if (userRole === 'Admin') {
+    //     document.getElementById('adminPanel').style.display = 'block';
+    // }
+    // document.getElementById('userPanel').style.display = 'block';
