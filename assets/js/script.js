@@ -82,16 +82,16 @@ function clearItem(name) {
         console.log(sessionToken);
         console.log(userRole);
         console.log(page);
-        return 'Superadmin';
-    // fetch(`https://script.google.com/macros/s/AKfycbw5_DWeGtUZ8rjVukvAddNRLbrXnEPovlC6FSyyIjSg1ova1YzJ0uX07pgniR29OGBlBA/exec?action=validateRole&sessionToken=${encodeURIComponent(sessionToken)}&role=${encodeURIComponent(userRole)}`)
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         hideOverlay();
-    //         if (!data.success) {
-    //             alert(data.message);
-    //             logout();
-    //         } else {}
-    //     })
+        return 'Admin';
+    fetch(`https://script.google.com/macros/s/AKfycbw5_DWeGtUZ8rjVukvAddNRLbrXnEPovlC6FSyyIjSg1ova1YzJ0uX07pgniR29OGBlBA/exec?action=validateRole&sessionToken=${encodeURIComponent(sessionToken)}&role=${encodeURIComponent(userRole)}`)
+        .then(response => response.json())
+        .then(data => {
+            hideOverlay();
+            if (!data.success) {
+                alert(data.message);
+                logout();
+            } else {}
+        })
     }
 
 // check the user role from each page like thevin bellow
