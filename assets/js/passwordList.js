@@ -16,108 +16,20 @@ showOverlay('--Loading--');
     // Fetch All Audit List From Backend
       document.addEventListener("DOMContentLoaded", function() {
       showOverlay('--Fetching Data--');
-    
-        // fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec',{
-        //     method: 'GET',
-        //     headers: {
-        //         'X-Requested-With': 'XMLHttpRequest'
-        //     }
-        //   })
-        //   .then(response => response.json())
-        //     .then(data => {
-        //       allData = data.sort((a, b) => moment(b.date, 'DD-MM-YYYY') - moment(a.date, 'DD-MM-YYYY'));
-        //       filteredData = allData;
-        //       displayedData = allData;
-        //       renderTable('short');
-        //       populateDropdowns(allData);
-        //       // console.log(allData);
-        //     })
-
         fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const allData = data.data;
+            allData = data.data.sort((a, b) => moment(b.date, 'DD-MM-YYYY') - moment(a.date, 'DD-MM-YYYY'));
             console.log(allData);
+
+            filteredData = allData;
+            displayedData = allData;
+            renderTable('short');
         }
         })
         .catch(error => console.error('Error fetching data:', error));
 
-        // Dummy data for testing
-        // Dummy data for testing the table
-        const dummyData = [
-            {
-                audit_number: 'AUD-001',
-                bca_id: 'BCA123',
-                bca_full_name: 'Rajesh Kumar',
-                bca_contact_no: '9876543210',
-                bca_bank: 'State Bank of India',
-                state: 'Maharashtra',
-                location: 'Mumbai',
-                status: 'Completed',
-                formatted_date: '15-08-2023',
-                user_full_name: 'Anita Sharma'
-            },
-            {
-                audit_number: 'AUD-002',
-                bca_id: 'BCA456',
-                bca_full_name: 'Sneha Patil',
-                bca_contact_no: '9876543220',
-                bca_bank: 'ICICI Bank',
-                state: 'Karnataka',
-                location: 'Bangalore',
-                status: 'In Progress',
-                formatted_date: '10-08-2023',
-                user_full_name: 'Vikram Singh'
-            },
-            {
-                audit_number: 'AUD-003',
-                bca_id: 'BCA789',
-                bca_full_name: 'Amitabh Thakur',
-                bca_contact_no: '9876543230',
-                bca_bank: 'HDFC Bank',
-                state: 'Delhi',
-                location: 'New Delhi',
-                status: 'Pending',
-                formatted_date: '20-08-2023',
-                user_full_name: 'Priya Nair'
-            },
-            {
-                audit_number: 'AUD-004',
-                bca_id: 'BCA012',
-                bca_full_name: 'Priya Gupta',
-                bca_contact_no: '9876543240',
-                bca_bank: 'Axis Bank',
-                state: 'Gujarat',
-                location: 'Ahmedabad',
-                status: 'Completed',
-                formatted_date: '05-08-2023',
-                user_full_name: 'Sunil Mehra'
-            },
-            {
-                audit_number: 'AUD-005',
-                bca_id: 'BCA345',
-                bca_full_name: 'Vikas Verma',
-                bca_contact_no: '9876543250',
-                bca_bank: 'Punjab National Bank',
-                state: 'Tamil Nadu',
-                location: 'Chennai',
-                status: 'In Progress',
-                formatted_date: '12-08-2023',
-                user_full_name: 'Rashmi Desai'
-            }
-        ];
-
-        // Example of using this dummy data in your table rendering
-        allData = dummyData.sort((a, b) => moment(b.formatted_date, 'DD-MM-YYYY') - moment(a.formatted_date, 'DD-MM-YYYY'));
-        filteredData = allData;
-        displayedData = allData;
-
-        // Call the functions as usual with the dummy data
-        renderTable('short');
-        populateDropdowns(allData);
-
-    
         // Date picker funtionality start
         $('#dateRange').daterangepicker({
             singleDatePicker: false,
@@ -192,16 +104,14 @@ showOverlay('--Loading--');
         let currentSortOrder = 'desc'; // Default to descending for date
     
         // Event listeners for sorting columns
-        document.getElementById('header-audit_number').addEventListener('click', () => sortTable('audit_number'));
-        document.getElementById('header-bca_id').addEventListener('click', () => sortTable('bca_id'));
-        document.getElementById('header-bca_full_name').addEventListener('click', () => sortTable('bca_full_name'));
-        document.getElementById('header-bca_bank').addEventListener('click', () => sortTable('bca_bank'));
-        document.getElementById('header-mobile_no').addEventListener('click', () => sortTable('mobile_no'));
+        document.getElementById('header-agent_id').addEventListener('click', () => sortTable('agent_id'));
+        document.getElementById('header-requested_by').addEventListener('click', () => sortTable('requested_by'));
+        document.getElementById('header-requested_by_email').addEventListener('click', () => sortTable('requested_by_email'));
         document.getElementById('header-state').addEventListener('click', () => sortTable('state'));
-        document.getElementById('header-location').addEventListener('click', () => sortTable('location'));
+        document.getElementById('header-requested_on').addEventListener('click', () => sortTable('requested_on'));
         document.getElementById('header-status').addEventListener('click', () => sortTable('status'));
-        document.getElementById('header-formatted_date').addEventListener('click', () => sortTable('formatted_date'));
-        document.getElementById('header-created_by').addEventListener('click', () => sortTable('created_by'));
+        document.getElementById('header-updated_on').addEventListener('click', () => sortTable('updated_on'));
+        document.getElementById('header-updated_by').addEventListener('click', () => sortTable('updated_by'));
     
         // Default sorting function
         function defaultSort() {
@@ -213,14 +123,14 @@ showOverlay('--Loading--');
                 if (dateA > dateB) return -1;
                 if (dateA < dateB) return 1;
     
-                // If dates are the same, compare by audit number (largest to smallest)
-                const auditNumberA = parseInt(a.audit_number.replace('AUD', ''), 10);
-                const auditNumberB = parseInt(b.audit_number.replace('AUD', ''), 10);
+                // If dates are the same, compare by agent id (largest to smallest)
+                const agentIdA = parseInt(a.agent_id.replace(/[A-Za-z]/g, ''), 10);
+                const agentIdB = parseInt(b.agent_id.replace(/[A-Za-z]/g, ''), 10);
                 
-                return auditNumberB - auditNumberA;
+                return agentIdB - agentIdA;
             });
         }
-    
+
         // Sort the table based on the clicked column
         function sortTable(column) {
             // Toggle sort order if the same column is clicked
@@ -230,26 +140,31 @@ showOverlay('--Loading--');
                 currentSortOrder = 'asc';
             }
             currentSortColumn = column;
-    
-            // Sort the data based on the current column and order
+
             displayedData.sort((a, b) => {
                 let valA, valB;
-                if (column === 'audit_number') {
-                    valA = parseInt(a[column].replace('AUD', ''), 10);
-                    valB = parseInt(b[column].replace('AUD', ''), 10);
+            
+                if (column === 'agent_id') {
+                    // Remove any alphabetic characters and parse as integer
+                    valA = parseInt(a[column].replace(/[A-Za-z]/g, ''), 10);
+                    valB = parseInt(b[column].replace(/[A-Za-z]/g, ''), 10);
                 } else if (column === 'formatted_date') {
+                    // Convert to Date object for proper date comparison
                     valA = new Date(a[column]);
                     valB = new Date(b[column]);
                 } else {
-                    valA = a[column];
-                    valB = b[column];
+                    // Default case: treat values as strings
+                    valA = a[column].toString().toLowerCase();
+                    valB = b[column].toString().toLowerCase();
                 }
+            
                 if (currentSortOrder === 'asc') {
                     return valA > valB ? 1 : -1;
                 } else {
                     return valA < valB ? 1 : -1;
                 }
             });
+            
     
             // Render the table with sorted data
             renderTable();
@@ -283,21 +198,20 @@ showOverlay('--Loading--');
             } else {
                 $('#exportData').prop('disabled', false);
                 paginatedData.forEach((item, index) => {
+                    // console.log(typeof item.bca_id)
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${start + index + 1}</td>
-                        <td>${item.audit_number}</td>
-                        <td>${item.bca_id}</td>
-                        <td>${item.bca_full_name}</td>
-                        <td>${item.bca_contact_no}</td>
-                        <td>${item.bca_bank}</td>
+                        <td>${item.agent_id}</td>
+                        <td>${item.requested_by}</td>
+                        <td>${item.requested_by_email}</td>
                         <td>${item.state}</td>
-                        <td>${item.location}</td>
+                        <td>${item.requested_on}</td>
                         <td>${item.status}</td>
-                        <td>${item.formatted_date}</td>
-                        <td>${item.user_full_name}</td>
+                        <td>${item.updated_on}</td>
+                        <td>${item.updated_by}</td>
                         <td>
-                        <button type="button" class="action-button" data-audit-number="${item.audit_number}" data-bca-id="${item.bca_id}" data-bca-name="${item.bca_full_name}" data-bca-state="${item.state}" data-bca-location="${item.location}">Open</button>
+                        <button type="button" class="action-button" data-agent-id="${item.agent_id}" data-bca-id="${item.bca_id}" data-bca-name="${item.bca_full_name}" data-bca-state="${item.state}" data-bca-location="${item.location}">Open</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -331,14 +245,14 @@ showOverlay('--Loading--');
                 dataTableBody.addEventListener('click', function(event) {
                     if (event.target && event.target.matches('button.action-button')) {
                         const button = event.target;
-                        const auditNumber = button.getAttribute('data-audit-number');
+                        const agentId = button.getAttribute('data-agent-id');
                         const bcaId = button.getAttribute('data-bca-id');
                         const bcaName = button.getAttribute('data-bca-name');
                         const state = button.getAttribute('data-bca-state');
                         const location = button.getAttribute('data-bca-location');
     
                         // Call storeSessionData with the appropriate data
-                        storeSessionData(bcaId, bcaName, state, location, auditNumber);
+                        storeSessionData(bcaId, bcaName, state, location, agentId);
                     }
                 });
             }
@@ -392,9 +306,9 @@ showOverlay('--Loading--');
       });
     }
         // Function to store session data
-        function storeSessionData(bcaId, bcaName, state, location, auditNumber) {
+        function storeSessionData(bcaId, bcaName, state, location, agentId) {
           showOverlay();
-            if (auditNumber){
+            if (agentId){
                 var action = 'newAudit';
             }else{
                 var action = 'existingAudit';
@@ -402,7 +316,7 @@ showOverlay('--Loading--');
           $.ajax({
             url: '/bcaudit/codes/store_session.php',
             type: 'POST',
-            data: { bcaId: bcaId, bcaName: bcaName, auditNumber: auditNumber, action: action, state: state, location: location },
+            data: { bcaId: bcaId, bcaName: bcaName, agentId: agentId, action: action, state: state, location: location },
             success: function(response) {
               hideOverlay();
               var result = JSON.parse(response);
@@ -422,52 +336,9 @@ showOverlay('--Loading--');
           });
         }
         // Function to store session data End
-    
-        //  Populate dropdown into filter modal field from fetched data
-        function populateDropdowns(data) {
-            const stateDropdown = document.getElementById('state');
-            // const districtDropdown = document.getElementById('district');
-            const locationDropdown = document.getElementById('location');
-            const bankDropdown = document.getElementById('bank');
-            const createdByDropdown = document.getElementById('createdBy');
-            const statusDropdown = document.getElementById('status');
-    
-            const states = [...new Set(data.map(item => item.state))];
-            // const districts = [...new Set(data.map(item => item.district))];
-            const locations = [...new Set(data.map(item => item.location))];
-            const banks = [...new Set(data.map(item => item.bca_bank))];
-            const users = [...new Set(data.map(item => item.user_full_name))];
-            const statuses = [...new Set(data.map(item => item.status))];
-    
-            populateDropdown(stateDropdown, states);
-            // populateDropdown(districtDropdown, districts);
-            populateDropdown(locationDropdown, locations);
-            populateDropdown(bankDropdown, banks);
-            populateDropdown(createdByDropdown, users);
-            populateDropdown(statusDropdown, statuses);
-        }
-    
-        function populateDropdown(dropdown, options) {
-            const selectedValue = dropdown.value;
-            dropdown.innerHTML = '<option class="defaultSelect" value="">Select</option>';
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.textContent = option;
-                dropdown.appendChild(opt);
-            });
-            dropdown.value = selectedValue;
-        }
-        //  Populate dropdown into filter modal field from fetched data End
-    
         // Apply Filter Function
         function applyFilters() {
-          const state = document.getElementById('state').value.toLowerCase();
-          const location = document.getElementById('location').value.toLowerCase();
-          const bank = document.getElementById('bank').value.toLowerCase();
-          const createdBy = document.getElementById('createdBy').value.toLowerCase();
           const status = document.getElementById('status').value.toLowerCase();
-          
           const dateRange = selectedDateRange || {
               start: moment().format('YYYY-MM-DD'),
               end: moment().format('YYYY-MM-DD')
@@ -475,26 +346,10 @@ showOverlay('--Loading--');
     
           // filter count part
           let filterCount = 0;
-          if (state !== '') filterCount++;
-          if (location !== '') filterCount++;
-          if (bank !== '') filterCount++;
-          if (createdBy !== '') filterCount++;
           if (status !== '') filterCount++;
-          if (dateRange.start !== '') filterCount++;
-          // console.log(dateRange.start);
           // date filter part
           filteredData = allData.filter(item => {
-              const itemDate = moment(item.created_date, 'DD-MM-YYYY');
-              const dateInRange = selectedDateRange ?
-                  itemDate.isBetween(dateRange.start, dateRange.end, null, '[]') :
-                  true;
-    
               // filter data asper valid input
-              return dateInRange &&
-                  (state === '' || item.state.toLowerCase().includes(state)) &&
-                  (location === '' || item.location.toLowerCase().includes(location)) &&
-                  (bank === '' || item.bca_bank.toLowerCase().includes(bank)) &&
-                  (createdBy === '' || item.user_full_name.toLowerCase().includes(createdBy)) &&
                   (status === '' || item.status.toLowerCase().includes(status));
           });
     
@@ -503,9 +358,6 @@ showOverlay('--Loading--');
     
           filtersApplied = true;
           searchTable();
-    
-          // Display the filter count
-          document.getElementById('filterCount').textContent = filterCount;
       }
     
         // clearFilters currently Not in use
@@ -526,22 +378,9 @@ showOverlay('--Loading--');
           $('#exportData').prop('disabled', true);
     
       if (filtersApplied) {
-        var startDate = selectedDateRange.start || '';
-        var endDate = selectedDateRange.end || '';
-        var state = $('#state').val();
-        var location = $('#location').val();
-        var createdBy = $('#createdBy').val();
-        var bank = $('#bank').val();
         var status = $('#status').val();
         // console.log(selectedDateRange.start);
         var queryParams = [];
-    
-        if (startDate) queryParams.push('start_date=' + encodeURIComponent(startDate));
-        if (endDate) queryParams.push('end_date=' + encodeURIComponent(endDate));
-        if (state) queryParams.push('state=' + encodeURIComponent(state));
-        if (location) queryParams.push('location=' + encodeURIComponent(location));
-        if (createdBy) queryParams.push('created_by=' + encodeURIComponent(createdBy));
-        if (bank) queryParams.push('bank=' + encodeURIComponent(bank));
         if (status) queryParams.push('status=' + encodeURIComponent(status));
     
         var queryString = queryParams.length ? '?' + queryParams.join('&') : '';
@@ -578,18 +417,18 @@ showOverlay('--Loading--');
             const dataToSearch = filtersApplied ? filteredData : allData;
     
             displayedData = dataToSearch.filter(item => {
-                return item.audit_number.toLowerCase().includes(query) ||
-                    item.bca_id.toLowerCase().includes(query) ||
-                    item.bca_full_name.toLowerCase().includes(query) ||
-                    item.bca_contact_no.toLowerCase().includes(query) ||
-                    item.bca_bank.toLowerCase().includes(query) ||
+                return item.agent_id.toLowerCase().includes(query) ||
+                    item.requested_by.toLowerCase().includes(query) ||
+                    item.requested_by_email.toLowerCase().includes(query) ||
                     item.state.toLowerCase().includes(query) ||
-                    item.location.toLowerCase().includes(query);
+                    item.status.toLowerCase().includes(query) ||
+                    item.updated_by.toLowerCase().includes(query);
             });
     
             currentPage = 1;
             renderTable();
         }
+        
         // data showing in table selection funtionality
         function changeEntriesPerPage() {
             entriesPerPage = parseInt(document.getElementById("entriesPerPage").value);

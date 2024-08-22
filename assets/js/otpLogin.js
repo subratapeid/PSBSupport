@@ -136,7 +136,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('userRole', data.userRole);
                 // console.log(data.sessionToken);
                 // console.log(data.userRole);
-                window.location.href = 'dashboard.html';
+                if(data.userRole == 'Super Admin'){
+                    window.location.href = 'dashboard.html';
+                }else if(data.userRole == 'Admin'){
+                    window.location.href = 'requested-password-reset-list.html';
+                }else{
+                    window.location.href = 'request-password-reset.html';
+                    }
                 // alert("OTP verified successfully. You are logged in!");
                 toastr.success("OTP verified successfully. You are logged in!");
             } else if (data.status === 'expired' || data.attemptsLeft == 0) {
