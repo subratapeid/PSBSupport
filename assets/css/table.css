@@ -1,3 +1,7 @@
+.selected {
+    background-color: #ea9e40;
+}
+
 .daterange-input {
     position: relative;
     display: inline-block;
