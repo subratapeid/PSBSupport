@@ -223,7 +223,6 @@ showOverlay('--Loading--');
             updateRecordInfo(displayedData.length, start, end);
             hideOverlay();
             onDataLoad();
-
         }
     
         // Update the table headers to show sorting icons
@@ -244,157 +243,194 @@ showOverlay('--Loading--');
     
         // Function to add event listeners after the table has been rendered
         function functionsAfterLoadTable() {
-                // hideOverlay();
-                // on click action button capture row data for storeSessionData
-                // dataTableBody.addEventListener('click', function(event) {
-
-
-                    // /////////////////////////////////////////
-                    let selectedCells = [];
-                    let isSelecting = false;
-                    let startCell = null;
-                    let lastCell = null;
-                //  console.log(document.getElementById('dataTable'));
-                    // Function to select a range of cells
-                    function selectRange(startCell, endCell) {
-                        const startRow = startCell.parentElement.rowIndex;
-                        const endRow = endCell.parentElement.rowIndex;
-                        const startCol = startCell.cellIndex;
-                        const endCol = endCell.cellIndex;
-                 console.log('selection range');
-                 console.log(startRow);
-                 console.log(endCol);
-                 
-                        const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
-                        const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
-                 
-                        // Clear previous selection if neither Shift nor Ctrl/Meta is held
-                        if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
-                            selectedCells.forEach(cell => cell.classList.remove('selected'));
-                            selectedCells = [];
-                        }
-                 
-                        for (let i = rowStart; i <= rowEnd; i++) {
-                            for (let j = colStart; j <= colEnd; j++) {
-                                const cell = document.getElementById('dataTable').rows[i].cells[j];
-                                if (!selectedCells.includes(cell)) {
-                                    cell.classList.add('selected');
-                                    selectedCells.push(cell);
-                                }
-                            }
+                hideOverlay();
+            // ////////////// data select and copy funtionality ///////////////////////////
+            let selectedCells = [];
+            let isSelecting = false;
+            let startCell = null;
+            let lastCell = null;
+            let scrollInterval = null;
+        
+            // Function to select a range of cells
+            function selectRange(startCell, endCell) {
+                const startRow = startCell.parentElement.rowIndex;
+                const endRow = endCell.parentElement.rowIndex;
+                const startCol = startCell.cellIndex;
+                const endCol = endCell.cellIndex;
+        
+                const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
+                const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
+        
+                // Clear previous selection if neither Shift nor Ctrl/Meta is held
+                if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
+                    selectedCells.forEach(cell => cell.classList.remove('selected'));
+                    selectedCells = [];
+                }
+        
+                for (let i = rowStart; i <= rowEnd; i++) {
+                    for (let j = colStart; j <= colEnd; j++) {
+                        const cell = document.getElementById('dataTable').rows[i].cells[j];
+                        if (!selectedCells.includes(cell)) {
+                            cell.classList.add('selected');
+                            selectedCells.push(cell);
                         }
                     }
-                 
-                    // Handle cell selection logic
-                    document.querySelectorAll('#dataTable td').forEach(cell => {
-                        cell.addEventListener('mousedown', (e) => {
-                            e.preventDefault(); // Prevent text selection
-                            isSelecting = true;
-                            startCell = cell;
-                            lastCell = cell;
-                 
-                            if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
-                                // If neither Shift nor Ctrl is pressed, reset previous selection
-                                selectedCells.forEach(cell => cell.classList.remove('selected'));
-                                selectedCells = [];
-                            }
-                 
-                            if (e.shiftKey && lastCell) {
-                                // Shift key: select range
-                                selectRange(lastCell, cell);
-                            } else if (e.ctrlKey || e.metaKey) {
-                                // Ctrl key: toggle individual cell
-                                if (selectedCells.includes(cell)) {
-                                    cell.classList.remove('selected');
-                                    selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
-                                } else {
-                                    cell.classList.add('selected');
-                                    selectedCells.push(cell);
-                                }
+                }
+            }
+        
+            // Start automatic scrolling if dragging near edges
+            function startScroll(e) {
+                const scrollZoneSize = 10; // Size of the scroll zone from the edges
+                const table = document.getElementById('dataTable');
+                const tableRect = table.getBoundingClientRect();
+        
+                // Check if the cursor is near the top or bottom edge
+                if (e.clientY < tableRect.top + scrollZoneSize) {
+                    scrollInterval = setInterval(() => {
+                        table.scrollTop -= 5;
+                    }, 20);
+                } else if (e.clientY > tableRect.bottom - scrollZoneSize) {
+                    scrollInterval = setInterval(() => {
+                        table.scrollTop += 5;
+                    }, 20);
+                }
+        
+                // Check if the cursor is near the left or right edge
+                if (e.clientX < tableRect.left + scrollZoneSize) {
+                    scrollInterval = setInterval(() => {
+                        table.scrollLeft -= 5;
+                    }, 20);
+                } else if (e.clientX > tableRect.right - scrollZoneSize) {
+                    scrollInterval = setInterval(() => {
+                        table.scrollLeft += 5;
+                    }, 20);
+                }
+            }
+        
+            // Stop scrolling when the mouse is released
+            function stopScroll() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                }
+            }
+        
+            // Handle cell selection logic
+            document.querySelectorAll('#dataTable td').forEach(cell => {
+                cell.addEventListener('mousedown', (e) => {
+                    e.preventDefault(); // Prevent text selection
+                    isSelecting = true;
+                    startCell = cell;
+                    lastCell = cell;
+        
+                    if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
+                        // If neither Shift nor Ctrl is pressed, reset previous selection
+                        selectedCells.forEach(cell => cell.classList.remove('selected'));
+                        selectedCells = [];
+                    }
+        
+                    if (e.shiftKey && lastCell) {
+                        // Shift key: select range
+                        selectRange(lastCell, cell);
+                    } else if (e.ctrlKey || e.metaKey) {
+                        // Ctrl key: toggle individual cell
+                        if (selectedCells.includes(cell)) {
+                            cell.classList.remove('selected');
+                            selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                        } else {
+                            cell.classList.add('selected');
+                            selectedCells.push(cell);
+                        }
+                    } else {
+                        // No key pressed: single selection
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
+                        lastCell = cell;
+                    }
+                });
+        
+                // Continue selecting cells while dragging with the mouse
+                cell.addEventListener('mouseover', (e) => {
+                    if (isSelecting) {
+                        if (e.shiftKey && lastCell) {
+                            // Shift key: select range
+                            selectRange(lastCell, cell);
+                        } else if (e.ctrlKey || e.metaKey) {
+                            // Ctrl key: toggle individual cell
+                            if (selectedCells.includes(cell)) {
+                                cell.classList.remove('selected');
+                                selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
                             } else {
-                                // No key pressed: single selection
                                 cell.classList.add('selected');
                                 selectedCells.push(cell);
-                                lastCell = cell;
                             }
-                        });
-                 
-                        // Continue selecting cells while dragging with the mouse
-                        cell.addEventListener('mouseover', (e) => {
-                            if (isSelecting) {
-                                if (e.shiftKey && lastCell) {
-                                    // Shift key: select range
-                                    selectRange(lastCell, cell);
-                                } else if (e.ctrlKey || e.metaKey) {
-                                    // Ctrl key: toggle individual cell
-                                    if (selectedCells.includes(cell)) {
-                                        cell.classList.remove('selected');
-                                        selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
-                                    } else {
-                                        cell.classList.add('selected');
-                                        selectedCells.push(cell);
-                                    }
-                                } else {
-                                    // Default behavior: select range if dragging
-                                    selectRange(startCell, cell);
-                                }
-                            }
-                        });
-                 
-                        // Stop selecting cells on mouse release
-                        cell.addEventListener('mouseup', () => {
-                            isSelecting = false;
-                            lastCell = cell;
-                        });
-                    });
-                 
-                    // Stop selecting if the mouse button is released outside the table
-                    document.addEventListener('mouseup', () => {
-                        isSelecting = false;
-                    });
-                 
-                    // Deselect all cells if clicking outside the table body
-                    document.addEventListener('click', (e) => {
-                        const table = document.getElementById('myTable');
-                        const isClickInsideTable = table.contains(e.target);
-                 
-                        if (!isClickInsideTable) {
-                            selectedCells.forEach(cell => cell.classList.remove('selected'));
-                            selectedCells = [];
-                            startCell = null;
-                            lastCell = null;
+                        } else {
+                            // Default behavior: select range if dragging
+                            selectRange(startCell, cell);
                         }
+        
+                        // Start scrolling if near the edge
+                        startScroll(e);
+                    }
+                });
+        
+                // Stop selecting cells on mouse release
+                cell.addEventListener('mouseup', () => {
+                    isSelecting = false;
+                    lastCell = cell;
+                    stopScroll();
+                });
+            });
+        
+            // Stop selecting if the mouse button is released outside the table
+            document.addEventListener('mouseup', () => {
+                isSelecting = false;
+                stopScroll();
+            });
+        
+            // Deselect all cells if clicking outside the table body
+            document.addEventListener('click', (e) => {
+                const table = document.getElementById('dataTable');
+                const isClickInsideTable = table.contains(e.target);
+        
+                if (!isClickInsideTable) {
+                    selectedCells.forEach(cell => cell.classList.remove('selected'));
+                    selectedCells = [];
+                    startCell = null;
+                    lastCell = null;
+                }
+            });
+        
+            // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    const selectedText = selectedCells.map(cell => cell.innerText).join('\n');
+                    navigator.clipboard.writeText(selectedText).then(() => {
+                        toastr.success('Selected data copied to clipboard.');
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
                     });
-                 
-                    // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
-                    document.addEventListener('keydown', (e) => {
-                        if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-                            e.preventDefault();
-                            const selectedText = selectedCells.map(cell => cell.innerText).join('\n');
-                            navigator.clipboard.writeText(selectedText).then(() => {
-                                alert('Selected data copied to clipboard.');
-                            }).catch(err => {
-                                console.error('Failed to copy text: ', err);
-                            });
-                        }
-                    });
+                }
+            });
 
+            // ////////////////// Data select and copy funtionality end //////////////////////////
 
+            // on click action button capture row data for storeSessionData
+                // dataTableBody.addEventListener('click', function(event) {
+            // if (event.target && event.target.matches('button.action-button')) {
+            //     const button = event.target;
+            //     const agentId = button.getAttribute('data-agent-id');
+            //     const bcaId = button.getAttribute('data-bca-id');
+            //     const bcaName = button.getAttribute('data-bca-name');
+            //     const state = button.getAttribute('data-bca-state');
+            //     const location = button.getAttribute('data-bca-location');
 
-                    // ////////////////////////////////////////////
-                    // if (event.target && event.target.matches('button.action-button')) {
-                    //     const button = event.target;
-                    //     const agentId = button.getAttribute('data-agent-id');
-                    //     const bcaId = button.getAttribute('data-bca-id');
-                    //     const bcaName = button.getAttribute('data-bca-name');
-                    //     const state = button.getAttribute('data-bca-state');
-                    //     const location = button.getAttribute('data-bca-location');
-    
-                    //     // Call storeSessionData with the appropriate data
-                    //     storeSessionData(bcaId, bcaName, state, location, agentId);
-                    // }
-                // });
-            }
+            //     // Call storeSessionData with the appropriate data
+            //     storeSessionData(bcaId, bcaName, state, location, agentId);
+            // }
+        // });
+    }
     
         // Call the function to add event listeners after setting innerHTML
         // Function to fetch BCA name on BCA ID input change

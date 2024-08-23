@@ -1,0 +1,167 @@
+<style>
+    /* Highlight selected cells */
+.selected {
+    background-color: #ea9e40;
+}
+
+</style>
+<table id="myTable">
+    <thead>
+        <tr>
+            <th>Agent ID</th>
+            <th>Requested By</th>
+            <th>Email</th>
+            <th>State</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>INT0027</td>
+            <td>John Doe</td>
+            <td>john@example.com</td>
+            <td>California</td>
+            <td>Completed</td>
+        </tr>
+        <tr>
+            <td>INT0026</td>
+            <td>Jane Smith</td>
+            <td>jane@example.com</td>
+            <td>Texas</td>
+            <td>In Progress</td>
+        </tr>
+        <!-- More rows... -->
+    </tbody>
+</table>
+
+
+<script>
+//    document.addEventListener('DOMContentLoaded', function() {
+    let selectedCells = [];
+    let isSelecting = false;
+    let startCell = null;
+    let lastCell = null;
+
+    // Function to select a range of cells
+    function selectRange(startCell, endCell) {
+        const startRow = startCell.parentElement.rowIndex;
+        const endRow = endCell.parentElement.rowIndex;
+        const startCol = startCell.cellIndex;
+        const endCol = endCell.cellIndex;
+
+        const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
+        const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
+
+        // Clear previous selection if neither Shift nor Ctrl/Meta is held
+        if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
+            selectedCells.forEach(cell => cell.classList.remove('selected'));
+            selectedCells = [];
+        }
+
+        for (let i = rowStart; i <= rowEnd; i++) {
+            for (let j = colStart; j <= colEnd; j++) {
+                const cell = document.getElementById('myTable').rows[i].cells[j];
+                if (!selectedCells.includes(cell)) {
+                    cell.classList.add('selected');
+                    selectedCells.push(cell);
+                }
+            }
+        }
+    }
+
+    // Handle cell selection logic
+    document.querySelectorAll('#myTable td').forEach(cell => {
+        cell.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent text selection
+            isSelecting = true;
+            startCell = cell;
+            lastCell = cell;
+
+            if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
+                // If neither Shift nor Ctrl is pressed, reset previous selection
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+                selectedCells = [];
+            }
+
+            if (e.shiftKey && lastCell) {
+                // Shift key: select range
+                selectRange(lastCell, cell);
+            } else if (e.ctrlKey || e.metaKey) {
+                // Ctrl key: toggle individual cell
+                if (selectedCells.includes(cell)) {
+                    cell.classList.remove('selected');
+                    selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                } else {
+                    cell.classList.add('selected');
+                    selectedCells.push(cell);
+                }
+            } else {
+                // No key pressed: single selection
+                cell.classList.add('selected');
+                selectedCells.push(cell);
+                lastCell = cell;
+            }
+        });
+
+        // Continue selecting cells while dragging with the mouse
+        cell.addEventListener('mouseover', (e) => {
+            if (isSelecting) {
+                if (e.shiftKey && lastCell) {
+                    // Shift key: select range
+                    selectRange(lastCell, cell);
+                } else if (e.ctrlKey || e.metaKey) {
+                    // Ctrl key: toggle individual cell
+                    if (selectedCells.includes(cell)) {
+                        cell.classList.remove('selected');
+                        selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                    } else {
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
+                    }
+                } else {
+                    // Default behavior: select range if dragging
+                    selectRange(startCell, cell);
+                }
+            }
+        });
+
+        // Stop selecting cells on mouse release
+        cell.addEventListener('mouseup', () => {
+            isSelecting = false;
+            lastCell = cell;
+        });
+    });
+
+    // Stop selecting if the mouse button is released outside the table
+    document.addEventListener('mouseup', () => {
+        isSelecting = false;
+    });
+
+    // Deselect all cells if clicking outside the table body
+    document.addEventListener('click', (e) => {
+        const table = document.getElementById('myTable');
+        const isClickInsideTable = table.contains(e.target);
+
+        if (!isClickInsideTable) {
+            selectedCells.forEach(cell => cell.classList.remove('selected'));
+            selectedCells = [];
+            startCell = null;
+            lastCell = null;
+        }
+    });
+
+    // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            const selectedText = selectedCells.map(cell => cell.innerText).join('\n');
+            navigator.clipboard.writeText(selectedText).then(() => {
+                alert('Selected data copied to clipboard.');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    });
+// });
+
+</script>
