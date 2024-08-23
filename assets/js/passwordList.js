@@ -203,6 +203,7 @@ showOverlay('--Loading--');
                     // console.log(typeof item.bca_id)
                     const row = document.createElement('tr');
                     row.innerHTML = `
+                        <td><input type="checkbox" class="selectItem" value="${item.id}"></td>
                         <td>${start + index + 1}</td>
                         <td>${item.agent_id}</td>
                         <td>${item.requested_by}</td>
@@ -213,7 +214,7 @@ showOverlay('--Loading--');
                         <td>${item.updated_on}</td>
                         <td>${item.updated_by}</td>
                         <td>
-                        <button type="button" class="action-button" data-agent-id="${item.agent_id}" data-bca-id="${item.bca_id}" data-bca-name="${item.bca_full_name}" data-bca-state="${item.state}" data-bca-location="${item.location}">Open</button>
+                        <button class="btn btn-sm btn-primary changeStatusSingle" data-id="${item.id}" data-bs-toggle="modal" data-bs-target="#statusModal">Change Status</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -449,6 +450,102 @@ showOverlay('--Loading--');
                     //     storeSessionData(bcaId, bcaName, state, location, agentId);
                     // }
                 // });
+
+                let selectedIds = [];
+
+                    // Enable/Disable the Change Status Button
+                    $('.selectItem').on('change', function() {
+                        toggleChangeStatusBtn();
+                    });
+        
+                    $('#selectAll').on('change', function() {
+                        $('.selectItem').prop('checked', this.checked);
+                        toggleChangeStatusBtn();
+                    });
+        
+                    $('.selectItem').on('change', function() {
+                        if ($('.selectItem:checked').length === $('.selectItem').length) {
+                            $('#selectAll').prop('checked', true);
+                        } else {
+                            $('#selectAll').prop('checked', false);
+                        }
+                        toggleChangeStatusBtn();
+                    });
+        
+                    function toggleChangeStatusBtn() {
+                        $('#changeStatusBtn').prop('disabled', $('.selectItem:checked').length === 0);
+                    }
+        
+                    // Show/hide remarks field based on selected status
+                    $('#status').on('change', function() {
+                        const selectedStatus = $(this).val();
+                        if (selectedStatus === 'Completed') {
+                            $('#remarksContainer').hide();
+                            $('#remarks').prop('required', false);
+                            $('#remarks').val('');
+                        } else {
+                            $('#remarksContainer').show();
+                            $('#remarks').prop('required', true);
+                        }
+                    });
+        
+                    // Handle Change Status for Single Row
+                    $('.changeStatusSingle').on('click', function() {
+                        selectedIds = [$(this).data('id')];
+                    });
+        
+                    // Handle Confirm Button Click
+                    $('#confirmBtn').on('click', function() {
+                        if (selectedIds.length === 0) {
+                            selectedIds = $('.selectItem:checked').map(function() {
+                                return this.value;
+                            }).get();
+                        }
+        
+                        const status = $('#status').val();
+                        const remarks = $('#remarks').val();
+        
+                        if (status === '') {
+                            alert('Please select a status.');
+                            return;
+                        }
+        
+                        if ($('#remarks').is(':required') && remarks.trim() === '') {
+                            $('#remarksError').show();
+                            return;
+                        } else {
+                            $('#remarksError').hide();
+                        }
+        
+                        // Send GET request with selected data IDs, status, and remarks
+                        const queryString = `?ids=${selectedIds.join(',')}&status=${status}&remarks=${encodeURIComponent(remarks)}`;
+                        const url = `/your-endpoint-url${queryString}`;
+        
+                        console.log('GET request URL:', url); // You can replace this with an actual AJAX request
+                        // Example AJAX request
+                        /*
+                        $.get(url, function(response) {
+                            // Handle response
+                            console.log('Response:', response);
+                        });
+                        */
+                        
+                        // Reset selected IDs
+                        selectedIds = [];
+        
+                        // Close the modal
+                        $('#statusModal').modal('hide');
+                    });
+        
+                    // Clear selected IDs when the modal is closed
+                    $('#statusModal').on('hidden.bs.modal', function () {
+                        selectedIds = [];
+                        $('#status').val('');
+                        $('#remarks').val('');
+                        $('#remarksContainer').hide();
+                        $('#remarksError').hide();
+                    });
+        
             }
     
         // Call the function to add event listeners after setting innerHTML
@@ -736,6 +833,8 @@ function searchTable() {
     
 
 
+
+ 
 
 
 
