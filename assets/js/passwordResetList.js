@@ -16,12 +16,12 @@ showOverlay('--Loading--');
     // Fetch All Audit List From Backend
       document.addEventListener("DOMContentLoaded", function() {
       showOverlay('--Fetching Data--');
-        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec')
+        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec?action=fetch')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             allData = data.data.sort((a, b) => moment(b.date, 'DD-MM-YYYY') - moment(a.date, 'DD-MM-YYYY'));
-            console.log(allData);
+            // console.log(allData);
 
             filteredData = allData;
             displayedData = allData;
@@ -106,8 +106,6 @@ showOverlay('--Loading--');
         // Event listeners for sorting columns
         document.getElementById('header-agent_id').addEventListener('click', () => sortTable('agent_id'));
         document.getElementById('header-requested_by').addEventListener('click', () => sortTable('requested_by'));
-        document.getElementById('header-requested_by_email').addEventListener('click', () => sortTable('requested_by_email'));
-        document.getElementById('header-state').addEventListener('click', () => sortTable('state'));
         document.getElementById('header-requested_on').addEventListener('click', () => sortTable('requested_on'));
         document.getElementById('header-status').addEventListener('click', () => sortTable('status'));
         document.getElementById('header-updated_on').addEventListener('click', () => sortTable('updated_on'));
@@ -207,8 +205,6 @@ showOverlay('--Loading--');
                         <td>${start + index + 1}</td>
                         <td>${item.agent_id}</td>
                         <td>${item.requested_by}</td>
-                        <td>${item.requested_by_email}</td>
-                        <td>${item.state}</td>
                         <td>${item.requested_on}</td>
                         <td>${item.status}</td>
                         <td>${item.updated_on}</td>
@@ -252,8 +248,7 @@ showOverlay('--Loading--');
         let startCell = null;
         let lastCell = null;
         let scrollInterval = null;
-        let isMouseDown = false;
-        const scrollSpeed = 15;
+        const scrollSpeed = 20;
 
         // Function to select a range of cells
         function selectRange(startCell, endCell) {
@@ -518,10 +513,35 @@ showOverlay('--Loading--');
                         }
         
                         // Send GET request with selected data IDs, status, and remarks
-                        const queryString = `?ids=${selectedIds.join(',')}&status=${status}&remarks=${encodeURIComponent(remarks)}`;
-                        const url = `/your-endpoint-url${queryString}`;
+                        const queryString = `?ids=${selectedIds.join(',')}&status=${status}&remarks=${encodeURIComponent(remarks)}&action=update`;
+                        const url = `https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec${queryString}`;
+
+                        showOverlay('--Updating Status--');
+                        fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                            toastr.success('Data Updated Successfully');
+                            // Uncomment and modify the following lines if you want to update the table with the new data
+                            // allData = data.data.sort((a, b) => moment(b.date, 'DD-MM-YYYY') - moment(a.date, 'DD-MM-YYYY'));
+                            // console.log(allData);
+                            // filteredData = allData;
+                            // displayedData = allData;
+                            // renderTable('short');
+                            } else {
+                            toastr.error('Error Updating Data');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            toastr.error('An error occurred while updating data.');
+                        })
+                        .finally(() => {
+                            hideOverlay(); // Hide the overlay regardless of success or failure
+                        });
+
         
-                        console.log('GET request URL:', url); // You can replace this with an actual AJAX request
+                        console.log('GET request URL:', url); // replace this with an actual AJAX request
                         // Example AJAX request
                         /*
                         $.get(url, function(response) {
@@ -529,7 +549,6 @@ showOverlay('--Loading--');
                             console.log('Response:', response);
                         });
                         */
-                        
                         // Reset selected IDs
                         selectedIds = [];
         
@@ -547,127 +566,23 @@ showOverlay('--Loading--');
                     });
         
             }
-    
-        // Call the function to add event listeners after setting innerHTML
-        // Function to fetch BCA name on BCA ID input change
-        $('#bcaId').on('input', function() {
-          var bcaId = $(this).val().trim();
-          if (bcaId.length >= 3) { // Only proceed if BCA ID is 6 characters long
-            fetchBcaName(bcaId);
-          } else {
-            $('#bcaName').val('').prop('disabled', true);
-            $('#proceedBtn').prop('disabled', true);
-            displayErrorMessage('Please enter a valid 3-digit BCA ID.');
-          }
-        });
-    
-        // Function to fetch BCA name via AJAX
-    function fetchBcaName(bcaId) {
-      $.ajax({
-        url: '/bcaudit/codes/fetchData/validate_bca_for_new_audit.php',
-        method: 'GET',
-        data: { bca_id: bcaId },
-        dataType: 'json',
-        success: function(response) {
-          if (response.success) {
-            // console.log(response);
-            var bcaName = response.data['bca_name'];
-            var state = response.data['state'];
-            var location = response.data['location'];
-            document.getElementById('errorMessageArea').style.display = 'none';
-            $('#bcaName').val(bcaName);
-            $('#proceedBtn').prop('disabled', false);
-    
-            // Enable proceed button click handler to store session data
-            $('#proceedBtn').off('click').on('click', function() {
-              storeSessionData(bcaId, bcaName, state, location);
-            });
-          } else {
-            $('#bcaName').val(response.message);
-            $('#proceedBtn').prop('disabled', true);
-            displayErrorMessage(response.message);
-          }
-        },
-        error: function() {
-          $('#bcaName').val('Error fetching name').prop('disabled', true);
-          $('#proceedBtn').prop('disabled', true);
-          displayErrorMessage('Error fetching BCA name. Please try again.');
-        }
-      });
-    }
-        // Function to store session data
-        function storeSessionData(bcaId, bcaName, state, location, agentId) {
-          showOverlay();
-            if (agentId){
-                var action = 'newAudit';
-            }else{
-                var action = 'existingAudit';
-            }
-          $.ajax({
-            url: '/bcaudit/codes/store_session.php',
-            type: 'POST',
-            data: { bcaId: bcaId, bcaName: bcaName, agentId: agentId, action: action, state: state, location: location },
-            success: function(response) {
-              hideOverlay();
-              
-              var result = JSON.parse(response);
-              if (result.success) {
-                // console.log('Session data stored successfully');
-                window.location.href = '/bcaudit/progress.php';
-              } else {
-                console.log('Error: ' + result.message);
-                alert('Error: ' + result.message);
-              }
-            },
-            error: function() {
-            hideOverlay();
-            alert('Error: Unable to send request');
-              console.log('AJAX request failed');
-            }
-          });
-        }
-        // Function to store session data End
 
+        // Apply filter based on the selectedStatus
         document.getElementById('filterStatus').addEventListener('change', function() {
             let status = this.value;
-        
-            // Apply filter logic here based on the selectedStatus
-            // applyFilter(selectedStatus);
+            filteredData = allData.filter(item => {
+                // Convert status to lowercase to handle case-insensitive filtering
+                let itemStatus = item.status.toLowerCase();
+                let filterStatus = status.toLowerCase();
 
-        // Apply Filter Function
-        // function applyFilter() {
-        //   const status = document.getElementById('status').value.toLowerCase();
-          // filter count part
-        filteredData = allData.filter(item => {
-            // Convert status to lowercase to handle case-insensitive filtering
-            let itemStatus = item.status.toLowerCase();
-            let filterStatus = status.toLowerCase();
-
-            // Filter data based on the status
-            return filterStatus === '' || itemStatus.includes(filterStatus);
-        });
-
-    
+                // Filter data based on the status
+                return filterStatus === '' || itemStatus.includes(filterStatus);
+            });
           // Remove input from search field
-          $('#searchInput').val('');
-    
+          $('#searchInput').val('');   
           filtersApplied = true;
           searchTable();
       });
-    
-        // clearFilters currently Not in use
-        function clearFilters() {
-            document.getElementById('filter-form').reset();
-            selectedDateRange = {
-                start: moment().subtract(7, 'days').format('DD-MM-YYYY'),
-                end: moment().format('DD-MM-YYYY')
-            };
-            $('#dateRange').val(`${selectedDateRange.start} - ${selectedDateRange.end}`);
-    
-            filteredData = allData;
-            filtersApplied = false;
-            searchTable();
-        }
     
         $('#exportData').on('click', function() {
           $('#exportData').prop('disabled', true);
@@ -684,7 +599,7 @@ showOverlay('--Loading--');
         var queryString = '';
       }
         
-      const url = `codes/download_audit_list_csv.php${queryString}`;
+      const url = `exportData.php${queryString}`;
         console.log("export button clicked");
     
         // Open the URL in a new tab
@@ -714,8 +629,6 @@ showOverlay('--Loading--');
         //     displayedData = dataToSearch.filter(item => {
         //         return item.agent_id.toLowerCase().includes(query) ||
         //             item.requested_by.toLowerCase().includes(query) ||
-        //             item.requested_by_email.toLowerCase().includes(query) ||
-        //             item.state.toLowerCase().includes(query) ||
         //             item.status.toLowerCase().includes(query) ||
         //             item.updated_by.toLowerCase().includes(query);
         //     });
@@ -726,34 +639,32 @@ showOverlay('--Loading--');
 
 
         // Search functionality on rendered table data
-function searchTable() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    function searchTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
 
-    // Split the query by comma, space, or new line to get individual agent IDs
-    const agentIds = query.split(/[\s,]+/).filter(id => id !== '');
+        // Split the query by comma, space, or new line to get individual agent IDs
+        const agentIds = query.split(/[\s,]+/).filter(id => id !== '');
 
-    const dataToSearch = filtersApplied ? filteredData : allData;
+        const dataToSearch = filtersApplied ? filteredData : allData;
 
-    if (agentIds.length > 0) {
-        displayedData = dataToSearch.filter(item => {
-            // Check if the agent_id is exactly in the list of agent IDs
-            return agentIds.includes(item.agent_id.toLowerCase());
-        });
-    } else {
-        // If no agent IDs are provided, return data based on other fields
-        displayedData = dataToSearch.filter(item => {
-            return item.agent_id.toLowerCase().includes(query) ||
-                item.requested_by.toLowerCase().includes(query) ||
-                item.requested_by_email.toLowerCase().includes(query) ||
-                item.state.toLowerCase().includes(query) ||
-                item.status.toLowerCase().includes(query) ||
-                item.updated_by.toLowerCase().includes(query);
-        });
+        if (agentIds.length > 0) {
+            displayedData = dataToSearch.filter(item => {
+                // Check if the agent_id is exactly in the list of agent IDs
+                return agentIds.includes(item.agent_id.toLowerCase());
+            });
+        } else {
+            // If no agent IDs are provided, return data based on other fields
+            displayedData = dataToSearch.filter(item => {
+                return item.agent_id.toLowerCase().includes(query) ||
+                    item.requested_by.toLowerCase().includes(query) ||
+                    item.status.toLowerCase().includes(query) ||
+                    item.updated_by.toLowerCase().includes(query);
+            });
+        }
+
+        currentPage = 1;
+        renderTable();
     }
-
-    currentPage = 1;
-    renderTable();
-}
 
 
         // data showing in table selection funtionality
@@ -824,12 +735,6 @@ function searchTable() {
         function updateRecordInfo(totalEntries, start, end) {
             document.getElementById('recordInfo').innerHTML = `Showing ${Math.min(start + 1, totalEntries)} to ${Math.min(end, totalEntries)} of ${totalEntries} entries`;
         }
-    
-      // Open filter modal popup and populate dropdown data
-      // filterModal.addEventListener('shown.bs.modal', function(event) {
-      //     // console.log('Modal is fully visible');
-      //     populateDropdowns(allData);
-      // });
     
 
 
