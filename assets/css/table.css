@@ -50,7 +50,7 @@
   margin: 0 10px 0 10px;
 }
   .table-container {
-      min-height: 600px;
+      min-height: auto;
       width: 100%;
       overflow-x: auto;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -86,7 +86,7 @@
           }
       }
   .data-container{
-      min-height: 600px;
+      min-height: auto;
       background-color: #fdfdfd;
       /* border: 1px solid #ddd; */
       overflow-x: auto;

@@ -2,24 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dynamic Table Selection and Copy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Table Scrolling and Selection</title>
     <style>
-        /* Highlight selected cells */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 200vh; /* Extend body height for vertical scrolling */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+        #mainContainer {
+            width: 80%;
+            overflow-x: auto; /* Horizontal scrolling inside the container */
+            position: relative;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 150%; /* Make the table wider than the container */
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: center;
+            user-select: none;
+        }
+
         .selected {
             background-color: #ea9e40;
-        }
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-            padding: 8px;
-        }
-        table {
-            width: 100%;
         }
     </style>
 </head>
 <body>
-    <table id="myTable">
+
+<div id="mainContainer">
+    <table id="dataTable">
         <thead>
             <tr>
                 <th>Agent ID</th>
@@ -30,185 +53,244 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamic rows will be appended here -->
+            <!-- Dummy data for testing -->
+            <tr><td>INT001</td><td>John Doe</td><td>john@example.com</td><td>California</td><td>Completed</td></tr>
+            <tr><td>INT002</td><td>Jane Smith</td><td>jane@example.com</td><td>Texas</td><td>In Progress</td></tr>
+            <tr><td>INT003</td><td>Mike Johnson</td><td>mike@example.com</td><td>New York</td><td>Pending</td></tr>
+            <tr><td>INT004</td><td>Emily Davis</td><td>emily@example.com</td><td>Florida</td><td>Completed</td></tr>
+            <tr><td>INT005</td><td>Chris Lee</td><td>chris@example.com</td><td>Washington</td><td>Completed</td></tr>
+            <tr><td>INT006</td><td>Anna Kim</td><td>anna@example.com</td><td>Nevada</td><td>In Progress</td></tr>
+            <tr><td>INT007</td><td>Robert Brown</td><td>robert@example.com</td><td>Ohio</td><td>Pending</td></tr>
+            <tr><td>INT008</td><td>Sarah Wilson</td><td>sarah@example.com</td><td>Arizona</td><td>Completed</td></tr>
+            <tr><td>INT009</td><td>David Martinez</td><td>david@example.com</td><td>Georgia</td><td>In Progress</td></tr>
+            <tr><td>INT010</td><td>Laura Garcia</td><td>laura@example.com</td><td>Oregon</td><td>Completed</td></tr>
+            <tr><td>INT001</td><td>John Doe</td><td>john@example.com</td><td>California</td><td>Completed</td></tr>
+            <tr><td>INT002</td><td>Jane Smith</td><td>jane@example.com</td><td>Texas</td><td>In Progress</td></tr>
+            <tr><td>INT003</td><td>Mike Johnson</td><td>mike@example.com</td><td>New York</td><td>Pending</td></tr>
+            <tr><td>INT004</td><td>Emily Davis</td><td>emily@example.com</td><td>Florida</td><td>Completed</td></tr>
+            <tr><td>INT005</td><td>Chris Lee</td><td>chris@example.com</td><td>Washington</td><td>Completed</td></tr>
+            <tr><td>INT006</td><td>Anna Kim</td><td>anna@example.com</td><td>Nevada</td><td>In Progress</td></tr>
+            <tr><td>INT007</td><td>Robert Brown</td><td>robert@example.com</td><td>Ohio</td><td>Pending</td></tr>
+            <tr><td>INT008</td><td>Sarah Wilson</td><td>sarah@example.com</td><td>Arizona</td><td>Completed</td></tr>
+            <tr><td>INT009</td><td>David Martinez</td><td>david@example.com</td><td>Georgia</td><td>In Progress</td></tr>
+            <tr><td>INT010</td><td>Laura Garcia</td><td>laura@example.com</td><td>Oregon</td><td>Completed</td></tr>
+            <tr><td>INT001</td><td>John Doe</td><td>john@example.com</td><td>California</td><td>Completed</td></tr>
+            <tr><td>INT002</td><td>Jane Smith</td><td>jane@example.com</td><td>Texas</td><td>In Progress</td></tr>
+            <tr><td>INT003</td><td>Mike Johnson</td><td>mike@example.com</td><td>New York</td><td>Pending</td></tr>
+            <tr><td>INT004</td><td>Emily Davis</td><td>emily@example.com</td><td>Florida</td><td>Completed</td></tr>
+            <tr><td>INT005</td><td>Chris Lee</td><td>chris@example.com</td><td>Washington</td><td>Completed</td></tr>
+            <tr><td>INT006</td><td>Anna Kim</td><td>anna@example.com</td><td>Nevada</td><td>In Progress</td></tr>
+            <tr><td>INT007</td><td>Robert Brown</td><td>robert@example.com</td><td>Ohio</td><td>Pending</td></tr>
+            <tr><td>INT008</td><td>Sarah Wilson</td><td>sarah@example.com</td><td>Arizona</td><td>Completed</td></tr>
+            <tr><td>INT009</td><td>David Martinez</td><td>david@example.com</td><td>Georgia</td><td>In Progress</td></tr>
+            <tr><td>INT010</td><td>Laura Garcia</td><td>laura@example.com</td><td>Oregon</td><td>Completed</td></tr>
+            <tr><td>INT001</td><td>John Doe</td><td>john@example.com</td><td>California</td><td>Completed</td></tr>
+            <tr><td>INT002</td><td>Jane Smith</td><td>jane@example.com</td><td>Texas</td><td>In Progress</td></tr>
+            <tr><td>INT003</td><td>Mike Johnson</td><td>mike@example.com</td><td>New York</td><td>Pending</td></tr>
+            <tr><td>INT004</td><td>Emily Davis</td><td>emily@example.com</td><td>Florida</td><td>Completed</td></tr>
+            <tr><td>INT005</td><td>Chris Lee</td><td>chris@example.com</td><td>Washington</td><td>Completed</td></tr>
+            <tr><td>INT006</td><td>Anna Kim</td><td>anna@example.com</td><td>Nevada</td><td>In Progress</td></tr>
+            <tr><td>INT007</td><td>Robert Brown</td><td>robert@example.com</td><td>Ohio</td><td>Pending</td></tr>
+            <tr><td>INT008</td><td>Sarah Wilson</td><td>sarah@example.com</td><td>Arizona</td><td>Completed</td></tr>
+            <tr><td>INT009</td><td>David Martinez</td><td>david@example.com</td><td>Georgia</td><td>In Progress</td></tr>
+            <tr><td>INT010</td><td>Laura Garcia</td><td>laura@example.com</td><td>Oregon</td><td>Completed</td></tr>
+            <!-- Add more rows if needed for testing -->
         </tbody>
     </table>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tableBody = document.querySelector('#myTable tbody');
-            let selectedCells = new Set();
-            let isSelecting = false;
-            let startCell = null;
-            let lastCell = null;
+<script>
+        // Data select and copy functionality
+        let selectedCells = [];
+        let isSelecting = false;
+        let startCell = null;
+        let lastCell = null;
+        let scrollInterval = null;
+        let isMouseDown = false;
+        const scrollSpeed = 15;
 
-            // Function to select a range of cells
-            function selectRange(startCell, endCell) {
-                const table = document.getElementById('myTable');
-                const startRow = startCell.parentElement.rowIndex;
-                const endRow = endCell.parentElement.rowIndex;
-                const startCol = startCell.cellIndex;
-                const endCol = endCell.cellIndex;
+        // Function to select a range of cells
+        function selectRange(startCell, endCell) {
+            const startRow = startCell.parentElement.rowIndex;
+            const endRow = endCell.parentElement.rowIndex;
+            const startCol = startCell.cellIndex;
+            const endCol = endCell.cellIndex;
 
-                const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
-                const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
+            const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
+            const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
 
-                // Clear previous selection if neither Shift nor Ctrl/Meta is held
-                if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
-                    clearSelection();
-                }
-
-                for (let i = rowStart; i <= rowEnd; i++) {
-                    for (let j = colStart; j <= colEnd; j++) {
-                        const cell = table.rows[i].cells[j];
-                        if (!selectedCells.has(cell)) {
-                            cell.classList.add('selected');
-                            selectedCells.add(cell);
-                        }
-                    }
-                }
-            }
-
-            // Function to clear all selections
-            function clearSelection() {
+            // Clear previous selection if neither Shift nor Ctrl/Meta is held
+            if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
                 selectedCells.forEach(cell => cell.classList.remove('selected'));
-                selectedCells.clear();
+                selectedCells = [];
             }
 
-            // Event delegation for mousedown, mouseover, and mouseup
-            tableBody.addEventListener('mousedown', function(e) {
-                if (e.target && e.target.nodeName === 'TD') {
-                    e.preventDefault(); // Prevent text selection
-                    isSelecting = true;
-                    startCell = e.target;
-                    lastCell = e.target;
-
-                    if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
-                        clearSelection();
-                    }
-
-                    if (e.shiftKey && lastCell) {
-                        selectRange(lastCell, e.target);
-                    } else if (e.ctrlKey || e.metaKey) {
-                        // Toggle selection
-                        if (selectedCells.has(e.target)) {
-                            e.target.classList.remove('selected');
-                            selectedCells.delete(e.target);
-                        } else {
-                            e.target.classList.add('selected');
-                            selectedCells.add(e.target);
-                        }
-                    } else {
-                        // Single selection
-                        e.target.classList.add('selected');
-                        selectedCells.add(e.target);
-                        lastCell = e.target;
+            for (let i = rowStart; i <= rowEnd; i++) {
+                for (let j = colStart; j <= colEnd; j++) {
+                    const cell = document.getElementById('dataTable').rows[i].cells[j];
+                    if (!selectedCells.includes(cell)) {
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
                     }
                 }
+            }
+        }
+
+        // Function to handle mouse movement and scrolling
+        function handleMouseMove(e) {
+            const table = document.getElementById('dataTable');
+            const tableContainer = table.parentElement;
+            const windowHeight = window.innerHeight;
+            let scrollX = 0, scrollY = 0;
+
+            if (isSelecting) {
+                if (e.clientX < tableContainer.getBoundingClientRect().left + 100) {
+                    scrollX = -scrollSpeed;
+                } else if (e.clientX > tableContainer.getBoundingClientRect().right - 20) {
+                    scrollX = scrollSpeed;
+                }
+
+                if (e.clientY < 100) {
+                    scrollY = -scrollSpeed;
+                } else if (e.clientY > windowHeight - 100) {
+                    scrollY = scrollSpeed;
+                }
+
+                tableContainer.scrollBy(scrollX, 0); // Horizontal scroll
+                window.scrollBy(0, scrollY);         // Vertical scroll
+
+                // Ensure continuous scrolling when cursor is at the edge
+                clearInterval(scrollInterval);
+                scrollInterval = setInterval(() => {
+                    tableContainer.scrollBy(scrollX, 0);
+                    window.scrollBy(0, scrollY);
+                }, 50);
+            }
+        }
+
+        // Function to stop scrolling
+        function handleMouseUp() {
+            isMouseDown = false;
+            isSelecting = false;
+
+            clearInterval(scrollInterval); // Stop continuous scrolling
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        // Attach event listeners to each cell
+        document.querySelectorAll('#dataTable td').forEach(cell => {
+            cell.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent text selection
+                isSelecting = true;
+                isMouseDown = true;
+                startCell = cell;
+                lastCell = cell;
+
+                if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
+                    // If neither Shift nor Ctrl is pressed, reset previous selection
+                    selectedCells.forEach(cell => cell.classList.remove('selected'));
+                    selectedCells = [];
+                }
+
+                if (e.shiftKey && lastCell) {
+                    // Shift key: select range
+                    selectRange(lastCell, cell);
+                } else if (e.ctrlKey || e.metaKey) {
+                    // Ctrl key: toggle individual cell
+                    if (selectedCells.includes(cell)) {
+                        cell.classList.remove('selected');
+                        selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                    } else {
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
+                    }
+                } else {
+                    // No key pressed: single selection
+                    cell.classList.add('selected');
+                    selectedCells.push(cell);
+                    lastCell = cell;
+                }
+                hasCopied = false;
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
             });
 
-            tableBody.addEventListener('mouseover', function(e) {
-                if (isSelecting && e.target && e.target.nodeName === 'TD') {
+            // Continue selecting cells while dragging with the mouse
+            cell.addEventListener('mouseover', (e) => {
+                if (isSelecting) {
+                hasCopied = false;
+
                     if (e.shiftKey && lastCell) {
-                        selectRange(lastCell, e.target);
+                        // Shift key: select range
+                        selectRange(lastCell, cell);
                     } else if (e.ctrlKey || e.metaKey) {
-                        // Toggle selection on hover with Ctrl/Cmd
-                        if (selectedCells.has(e.target)) {
-                            e.target.classList.remove('selected');
-                            selectedCells.delete(e.target);
+                        // Ctrl key: toggle individual cell
+                        if (selectedCells.includes(cell)) {
+                            cell.classList.remove('selected');
+                            selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
                         } else {
-                            e.target.classList.add('selected');
-                            selectedCells.add(e.target);
+                            cell.classList.add('selected');
+                            selectedCells.push(cell);
                         }
                     } else {
                         // Default behavior: select range if dragging
-                        selectRange(startCell, e.target);
+                        selectRange(startCell, cell);
                     }
                 }
             });
-
-            tableBody.addEventListener('mouseup', function(e) {
-                if (e.target && e.target.nodeName === 'TD') {
-                    isSelecting = false;
-                    lastCell = e.target;
-                }
-            });
-
-            // Handle mouseup outside the table
-            document.addEventListener('mouseup', function() {
-                isSelecting = false;
-            });
-
-            // Deselect all cells if clicking outside the table body
-            document.addEventListener('click', function(e) {
-                const table = document.getElementById('myTable');
-                const isClickInsideTable = table.contains(e.target);
-
-                if (!isClickInsideTable) {
-                    clearSelection();
-                    startCell = null;
-                    lastCell = null;
-                }
-            });
-
-            // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-                    if (selectedCells.size > 0) {
-                        e.preventDefault();
-                        const selectedText = Array.from(selectedCells)
-                            .map(cell => cell.innerText)
-                            .join('\n');
-                        navigator.clipboard.writeText(selectedText).then(() => {
-                            alert('Selected data copied to clipboard.');
-                        }).catch(err => {
-                            console.error('Failed to copy text: ', err);
-                        });
-                    }
-                }
-            });
-
-            // Example function to dynamically add rows (simulate data fetching)
-            function addRows(data) {
-                data.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${item.agent_id}</td>
-                        <td>${item.requested_by}</td>
-                        <td>${item.email}</td>
-                        <td>${item.state}</td>
-                        <td>${item.status}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-
-            // Simulate fetching data and populating the table
-            function fetchData() {
-                // Replace this with your actual data fetching logic
-                const dummyData = [
-                    { agent_id: 'INT0027', requested_by: 'John Doe', email: 'john@example.com', state: 'California', status: 'Completed' },
-                    { agent_id: 'INT0026', requested_by: 'Jane Smith', email: 'jane@example.com', state: 'Texas', status: 'In Progress' },
-                    // Add more data as needed
-                ];
-                addRows(dummyData);
-            }
-
-            // Initial data load
-            fetchData();
-
-            // Example pagination handling (reload table data and reinitialize interactions)
-            // You would replace this with your actual pagination logic
-            /*
-            function handlePagination(pageNumber) {
-                // Fetch and display data for the given page
-                fetchDataForPage(pageNumber).then(data => {
-                    clearTable();
-                    addRows(data);
-                });
-            }
-            */
         });
-    </script>
+
+        // Stop selecting if the mouse button is released outside the table
+        document.addEventListener('mouseup', handleMouseUp);
+
+        // Deselect all cells if clicking outside the table body
+        document.addEventListener('click', (e) => {
+            const table = document.getElementById('dataTable');
+            const isClickInsideTable = table.contains(e.target);
+
+            if (!isClickInsideTable) {
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+                selectedCells = [];
+                startCell = null;
+                lastCell = null;
+            }
+        });
+
+        // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
+        var hasCopied = false; // Flag to prevent multiple notifications
+        document.addEventListener('keydown', (e) => {
+    if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+
+        if (!hasCopied && selectedCells.length > 0) {
+            // Group selected cells by rows
+            const rows = {};
+
+            selectedCells.forEach(cell => {
+                const rowIndex = cell.parentElement.rowIndex;
+                if (!rows[rowIndex]) {
+                    rows[rowIndex] = [];
+                }
+                rows[rowIndex].push(cell.innerText);
+            });
+
+            // Convert rows to tab-separated format
+            const selectedText = Object.values(rows).map(row => row.join('\t')).join('\n');
+
+            navigator.clipboard.writeText(selectedText).then(() => {
+                alert('Selected data copied to clipboard.');
+                hasCopied = true;
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    }
+});
+
+        
+        // ////////////////// Data select and copy funtionality end //////////////////////////
+</script>
+
 </body>
 </html>

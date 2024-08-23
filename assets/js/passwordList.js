@@ -243,92 +243,129 @@ showOverlay('--Loading--');
     
         // Function to add event listeners after the table has been rendered
         function functionsAfterLoadTable() {
-                hideOverlay();
-            // ////////////// data select and copy funtionality ///////////////////////////
-            let selectedCells = [];
-            let isSelecting = false;
-            let startCell = null;
-            let lastCell = null;
-            let scrollInterval = null;
+            hideOverlay();
         
-            // Function to select a range of cells
-            function selectRange(startCell, endCell) {
-                const startRow = startCell.parentElement.rowIndex;
-                const endRow = endCell.parentElement.rowIndex;
-                const startCol = startCell.cellIndex;
-                const endCol = endCell.cellIndex;
-        
-                const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
-                const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
-        
-                // Clear previous selection if neither Shift nor Ctrl/Meta is held
-                if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
+            // Data select and copy functionality
+        let selectedCells = [];
+        let isSelecting = false;
+        let startCell = null;
+        let lastCell = null;
+        let scrollInterval = null;
+        let isMouseDown = false;
+        const scrollSpeed = 15;
+
+        // Function to select a range of cells
+        function selectRange(startCell, endCell) {
+            const startRow = startCell.parentElement.rowIndex;
+            const endRow = endCell.parentElement.rowIndex;
+            const startCol = startCell.cellIndex;
+            const endCol = endCell.cellIndex;
+
+            const [rowStart, rowEnd] = startRow < endRow ? [startRow, endRow] : [endRow, startRow];
+            const [colStart, colEnd] = startCol < endCol ? [startCol, endCol] : [endCol, startCol];
+
+            // Clear previous selection if neither Shift nor Ctrl/Meta is held
+            if (!(window.event.shiftKey || window.event.ctrlKey || window.event.metaKey)) {
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+                selectedCells = [];
+            }
+
+            for (let i = rowStart; i <= rowEnd; i++) {
+                for (let j = colStart; j <= colEnd; j++) {
+                    const cell = document.getElementById('dataTable').rows[i].cells[j];
+                    if (!selectedCells.includes(cell)) {
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
+                    }
+                }
+            }
+        }
+
+        // Function to handle mouse movement and scrolling
+        function handleMouseMove(e) {
+            const table = document.getElementById('dataTable');
+            const tableContainer = table.parentElement;
+            const windowHeight = window.innerHeight;
+            let scrollX = 0, scrollY = 0;
+
+            if (isSelecting) {
+                if (e.clientX < tableContainer.getBoundingClientRect().left + 100) {
+                    scrollX = -scrollSpeed;
+                } else if (e.clientX > tableContainer.getBoundingClientRect().right - 20) {
+                    scrollX = scrollSpeed;
+                }
+
+                if (e.clientY < 100) {
+                    scrollY = -scrollSpeed;
+                } else if (e.clientY > windowHeight - 100) {
+                    scrollY = scrollSpeed;
+                }
+
+                tableContainer.scrollBy(scrollX, 0); // Horizontal scroll
+                window.scrollBy(0, scrollY);         // Vertical scroll
+
+                // Ensure continuous scrolling when cursor is at the edge
+                clearInterval(scrollInterval);
+                scrollInterval = setInterval(() => {
+                    tableContainer.scrollBy(scrollX, 0);
+                    window.scrollBy(0, scrollY);
+                }, 50);
+            }
+        }
+
+        // Function to stop scrolling
+        function handleMouseUp() {
+            isMouseDown = false;
+            isSelecting = false;
+
+            clearInterval(scrollInterval); // Stop continuous scrolling
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        // Attach event listeners to each cell
+        document.querySelectorAll('#dataTable td').forEach(cell => {
+            cell.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent text selection
+                isSelecting = true;
+                isMouseDown = true;
+                startCell = cell;
+                lastCell = cell;
+
+                if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
+                    // If neither Shift nor Ctrl is pressed, reset previous selection
                     selectedCells.forEach(cell => cell.classList.remove('selected'));
                     selectedCells = [];
                 }
-        
-                for (let i = rowStart; i <= rowEnd; i++) {
-                    for (let j = colStart; j <= colEnd; j++) {
-                        const cell = document.getElementById('dataTable').rows[i].cells[j];
-                        if (!selectedCells.includes(cell)) {
-                            cell.classList.add('selected');
-                            selectedCells.push(cell);
-                        }
+
+                if (e.shiftKey && lastCell) {
+                    // Shift key: select range
+                    selectRange(lastCell, cell);
+                } else if (e.ctrlKey || e.metaKey) {
+                    // Ctrl key: toggle individual cell
+                    if (selectedCells.includes(cell)) {
+                        cell.classList.remove('selected');
+                        selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                    } else {
+                        cell.classList.add('selected');
+                        selectedCells.push(cell);
                     }
-                }
-            }
-        
-            // Start automatic scrolling if dragging near edges
-            function startScroll(e) {
-                const scrollZoneSize = 10; // Size of the scroll zone from the edges
-                const table = document.getElementById('dataTable');
-                const tableRect = table.getBoundingClientRect();
-        
-                // Check if the cursor is near the top or bottom edge
-                if (e.clientY < tableRect.top + scrollZoneSize) {
-                    scrollInterval = setInterval(() => {
-                        table.scrollTop -= 5;
-                    }, 20);
-                } else if (e.clientY > tableRect.bottom - scrollZoneSize) {
-                    scrollInterval = setInterval(() => {
-                        table.scrollTop += 5;
-                    }, 20);
-                }
-        
-                // Check if the cursor is near the left or right edge
-                if (e.clientX < tableRect.left + scrollZoneSize) {
-                    scrollInterval = setInterval(() => {
-                        table.scrollLeft -= 5;
-                    }, 20);
-                } else if (e.clientX > tableRect.right - scrollZoneSize) {
-                    scrollInterval = setInterval(() => {
-                        table.scrollLeft += 5;
-                    }, 20);
-                }
-            }
-        
-            // Stop scrolling when the mouse is released
-            function stopScroll() {
-                if (scrollInterval) {
-                    clearInterval(scrollInterval);
-                    scrollInterval = null;
-                }
-            }
-        
-            // Handle cell selection logic
-            document.querySelectorAll('#dataTable td').forEach(cell => {
-                cell.addEventListener('mousedown', (e) => {
-                    e.preventDefault(); // Prevent text selection
-                    isSelecting = true;
-                    startCell = cell;
+                } else {
+                    // No key pressed: single selection
+                    cell.classList.add('selected');
+                    selectedCells.push(cell);
                     lastCell = cell;
-        
-                    if (!(e.shiftKey || e.ctrlKey || e.metaKey)) {
-                        // If neither Shift nor Ctrl is pressed, reset previous selection
-                        selectedCells.forEach(cell => cell.classList.remove('selected'));
-                        selectedCells = [];
-                    }
-        
+                }
+                hasCopied = false;
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            });
+
+            // Continue selecting cells while dragging with the mouse
+            cell.addEventListener('mouseover', (e) => {
+                if (isSelecting) {
+                hasCopied = false;
+
                     if (e.shiftKey && lastCell) {
                         // Shift key: select range
                         selectRange(lastCell, cell);
@@ -342,95 +379,77 @@ showOverlay('--Loading--');
                             selectedCells.push(cell);
                         }
                     } else {
-                        // No key pressed: single selection
-                        cell.classList.add('selected');
-                        selectedCells.push(cell);
-                        lastCell = cell;
+                        // Default behavior: select range if dragging
+                        selectRange(startCell, cell);
                     }
-                });
-        
-                // Continue selecting cells while dragging with the mouse
-                cell.addEventListener('mouseover', (e) => {
-                    if (isSelecting) {
-                        if (e.shiftKey && lastCell) {
-                            // Shift key: select range
-                            selectRange(lastCell, cell);
-                        } else if (e.ctrlKey || e.metaKey) {
-                            // Ctrl key: toggle individual cell
-                            if (selectedCells.includes(cell)) {
-                                cell.classList.remove('selected');
-                                selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
-                            } else {
-                                cell.classList.add('selected');
-                                selectedCells.push(cell);
-                            }
-                        } else {
-                            // Default behavior: select range if dragging
-                            selectRange(startCell, cell);
-                        }
-        
-                        // Start scrolling if near the edge
-                        startScroll(e);
-                    }
-                });
-        
-                // Stop selecting cells on mouse release
-                cell.addEventListener('mouseup', () => {
-                    isSelecting = false;
-                    lastCell = cell;
-                    stopScroll();
-                });
-            });
-        
-            // Stop selecting if the mouse button is released outside the table
-            document.addEventListener('mouseup', () => {
-                isSelecting = false;
-                stopScroll();
-            });
-        
-            // Deselect all cells if clicking outside the table body
-            document.addEventListener('click', (e) => {
-                const table = document.getElementById('dataTable');
-                const isClickInsideTable = table.contains(e.target);
-        
-                if (!isClickInsideTable) {
-                    selectedCells.forEach(cell => cell.classList.remove('selected'));
-                    selectedCells = [];
-                    startCell = null;
-                    lastCell = null;
                 }
             });
+        });
+
+        // Stop selecting if the mouse button is released outside the table
+        document.addEventListener('mouseup', handleMouseUp);
+
+        // Deselect all cells if clicking outside the table body
+        document.addEventListener('click', (e) => {
+            const table = document.getElementById('dataTable');
+            const isClickInsideTable = table.contains(e.target);
+
+            if (!isClickInsideTable) {
+                selectedCells.forEach(cell => cell.classList.remove('selected'));
+                selectedCells = [];
+                startCell = null;
+                lastCell = null;
+            }
+        });
+
+        // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
+        var hasCopied = false; // Flag to prevent multiple notifications
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
         
-            // Copy selected cells' text to clipboard when Ctrl+C or Cmd+C is pressed
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    const selectedText = selectedCells.map(cell => cell.innerText).join('\n');
+                if (!hasCopied && selectedCells.length > 0) {
+                    // Group selected cells by rows
+                    const rows = {};
+        
+                    selectedCells.forEach(cell => {
+                        const rowIndex = cell.parentElement.rowIndex;
+                        if (!rows[rowIndex]) {
+                            rows[rowIndex] = [];
+                        }
+                        rows[rowIndex].push(cell.innerText);
+                    });
+        
+                    // Convert rows to tab-separated format
+                    const selectedText = Object.values(rows).map(row => row.join('\t')).join('\n');
+        
                     navigator.clipboard.writeText(selectedText).then(() => {
-                        toastr.success('Selected data copied to clipboard.');
+                        toastr.info('Selected data copied to clipboard.');
+                        hasCopied = true;
                     }).catch(err => {
                         console.error('Failed to copy text: ', err);
                     });
                 }
-            });
+            }
+        });        
+        
+        // ////////////////// Data select and copy funtionality end //////////////////////////
 
-            // ////////////////// Data select and copy funtionality end //////////////////////////
+                    // on click action button capture row data for storeSessionData
+                        // dataTableBody.addEventListener('click', function(event) {
+                    // if (event.target && event.target.matches('button.action-button')) {
+                    //     const button = event.target;
+                    //     const agentId = button.getAttribute('data-agent-id');
+                    //     const bcaId = button.getAttribute('data-bca-id');
+                    //     const bcaName = button.getAttribute('data-bca-name');
+                    //     const state = button.getAttribute('data-bca-state');
+                    //     const location = button.getAttribute('data-bca-location');
 
-            // on click action button capture row data for storeSessionData
-                // dataTableBody.addEventListener('click', function(event) {
-            // if (event.target && event.target.matches('button.action-button')) {
-            //     const button = event.target;
-            //     const agentId = button.getAttribute('data-agent-id');
-            //     const bcaId = button.getAttribute('data-bca-id');
-            //     const bcaName = button.getAttribute('data-bca-name');
-            //     const state = button.getAttribute('data-bca-state');
-            //     const location = button.getAttribute('data-bca-location');
-
-            //     // Call storeSessionData with the appropriate data
-            //     storeSessionData(bcaId, bcaName, state, location, agentId);
-            // }
-        // });
-    }
+                    //     // Call storeSessionData with the appropriate data
+                    //     storeSessionData(bcaId, bcaName, state, location, agentId);
+                    // }
+                // });
+            }
     
         // Call the function to add event listeners after setting innerHTML
         // Function to fetch BCA name on BCA ID input change
@@ -511,29 +530,33 @@ showOverlay('--Loading--');
           });
         }
         // Function to store session data End
+
+        document.getElementById('filterStatus').addEventListener('change', function() {
+            let status = this.value;
+        
+            // Apply filter logic here based on the selectedStatus
+            // applyFilter(selectedStatus);
+
         // Apply Filter Function
-        function applyFilters() {
-          const status = document.getElementById('status').value.toLowerCase();
-          const dateRange = selectedDateRange || {
-              start: moment().format('YYYY-MM-DD'),
-              end: moment().format('YYYY-MM-DD')
-          };
-    
+        // function applyFilter() {
+        //   const status = document.getElementById('status').value.toLowerCase();
           // filter count part
-          let filterCount = 0;
-          if (status !== '') filterCount++;
-          // date filter part
-          filteredData = allData.filter(item => {
-              // filter data asper valid input
-                  (status === '' || item.status.toLowerCase().includes(status));
-          });
+        filteredData = allData.filter(item => {
+            // Convert status to lowercase to handle case-insensitive filtering
+            let itemStatus = item.status.toLowerCase();
+            let filterStatus = status.toLowerCase();
+
+            // Filter data based on the status
+            return filterStatus === '' || itemStatus.includes(filterStatus);
+        });
+
     
           // Remove input from search field
           $('#searchInput').val('');
     
           filtersApplied = true;
           searchTable();
-      }
+      });
     
         // clearFilters currently Not in use
         function clearFilters() {
