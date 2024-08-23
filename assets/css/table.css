@@ -336,6 +336,74 @@ font-style: normal;
 }
 /* datepicker calender area end*/
 
+.checkbox-container {
+    display: flex;
+    position: relative;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.checkbox-container .label {
+    margin-left: 5px; /* Space between the checkbox and the label text */
+}
+
+td.checkbox-cell .checkbox-container {
+    padding: 12px; /* Different padding for header checkbox */
+
+}
+
+/* th input.checkbox-container {
+    padding: 5px;
+} */
+/* Hide the default checkbox */
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Custom checkmark */
+.checkmark {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 4px;
+    border: 1px solid #202020;
+}
+
+/* Checkmark when checked */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #369706;
+    border: 1px solid #3cff42;
+}
+
+/* Checkmark after checking */
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+/* Show checkmark icon */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Checkmark icon (tick) */
+.checkbox-container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+
   @media (max-width: 780px) {
       .show-pages{
           display: none;

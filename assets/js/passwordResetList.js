@@ -16,7 +16,7 @@ showOverlay('--Loading--');
     // Fetch All Audit List From Backend
       document.addEventListener("DOMContentLoaded", function() {
       showOverlay('--Fetching Data--');
-        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec?action=fetch')
+        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec?action=fetch&status=pending')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
@@ -114,8 +114,8 @@ showOverlay('--Loading--');
         // Default sorting function
         function defaultSort() {
             displayedData.sort((a, b) => {
-                const dateA = new Date(a.formatted_date);
-                const dateB = new Date(b.formatted_date);
+                const dateA = new Date(a.requested_on);
+                const dateB = new Date(b.requested_on);
                 
                 // Compare by date in descending order (most recent first)
                 if (dateA > dateB) return -1;
@@ -201,12 +201,27 @@ showOverlay('--Loading--');
                     // console.log(typeof item.bca_id)
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td><input type="checkbox" class="selectItem" value="${item.id}"></td>
+                        <td class="checkbox-cell" style="padding: 0px 5px;">
+                            <label class="checkbox-container">
+                                <input type="checkbox" class="selectItem" data-id="${item.id}" value="${item.id}">
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+
                         <td>${start + index + 1}</td>
                         <td>${item.agent_id}</td>
                         <td>${item.requested_by}</td>
                         <td>${item.requested_on}</td>
-                        <td>${item.status}</td>
+                        <td> <span class="badge 
+                            ${item.status === 'ResetDone' ? 'bg-success' :
+                                item.status === 'Rejected' ? 'bg-danger' :
+                                item.status === 'pending' ? 'bg-warning text-dark' :
+                                'bg-secondary'}">
+                            ${item.status === 'ResetDone' ? 'Reset Done' :
+                                item.status === 'Rejected' ? 'Rejected' :
+                                item.status === 'pending' ? 'Pending' :
+                                'Unknown'}
+                            </span></td>
                         <td>${item.updated_on}</td>
                         <td>${item.updated_by}</td>
                         <td>
@@ -474,7 +489,7 @@ showOverlay('--Loading--');
                     // Show/hide remarks field based on selected status
                     $('#status').on('change', function() {
                         const selectedStatus = $(this).val();
-                        if (selectedStatus === 'Completed') {
+                        if (selectedStatus === 'ResetDone') {
                             $('#remarksContainer').hide();
                             $('#remarks').prop('required', false);
                             $('#remarks').val('');
