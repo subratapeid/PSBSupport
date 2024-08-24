@@ -16,7 +16,7 @@ showOverlay('--Loading--');
     // Fetch All Audit List From Backend
       document.addEventListener("DOMContentLoaded", function() {
       showOverlay('--Fetching Data--');
-        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec?action=fetch&status=pending')
+        fetch('https://script.google.com/macros/s/AKfycbxT6kTAbSuPP_elWn97FceD8542tjsyPb7ihOsTgNx_J-jApuOj-g2tn3p68fQLX5YEhw/exec?action=fetch')
     .then(response => response.json())
     .then(data => {
         if (data.success) {
