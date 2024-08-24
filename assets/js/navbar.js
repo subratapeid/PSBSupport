@@ -163,21 +163,6 @@ const markActiveMenuItem = () => {
     }
   });
 };
-
-// User menu popup
-const userIcon = document.getElementById('userImage');
-            const userMenu = document.getElementById('userMenu');
-
-            userIcon.addEventListener('click', function() {
-                userMenu.classList.toggle('active');
-            });
-
-            document.addEventListener('click', function(event) {
-                if (!userMenu.contains(event.target) && !userIcon.contains(event.target)) {
-                    userMenu.classList.remove('active');
-                }
-            });
-
   // Call the function on page load
 markActiveMenuItem();
 initializePreferences();     

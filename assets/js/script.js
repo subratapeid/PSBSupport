@@ -70,7 +70,7 @@ function clearItem(name) {
 }
 
 
-    showOverlay('--Please Wait--');
+    // showOverlay('--Please Wait--');
     const sessionToken = localStorage.getItem('sessionToken');
     const userRole = localStorage.getItem('userRole');
 
