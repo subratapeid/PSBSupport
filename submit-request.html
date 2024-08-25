@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent ID Form</title>
+
+ <style>
+    #spinner {
+        display: none;
+    }
+    .form-container {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #fff;
+    }
+    .input-group.invalid .form-control {
+        border-color: #dc3545;
+        background-color: #f8d7da;
+    }
+    .input-group.invalid .invalid-feedback {
+        display: block;
+    }
+</style>
+</head>
+<body>
+    <!-- include in every page -->
+    <div id="header"></div>
+    <div class="main">
+    <!-- ///////////////////////////////////// -->
+
+    <!-- Main Content Here -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <!-- Form Container with Outline and Shadow -->
+                <div class="card shadow-sm p-4">
+                    <h4 class="mb-4">Password Reset Request</h4>
+                    <form id="agentForm">
+                        <p>*Please Enter One Agent Id in Each Field</p>
+                        <!-- Input Fields Section -->
+                        <div id="inputFields">
+                            <div class="mb-3 input-group">
+                                <span class="input-group-text">1</span>
+                                <input type="text" class="form-control" name="agentId[]" placeholder="Enter Agent ID" oninput="sanitizeInput(this)">
+                                <button class="btn btn-outline-danger" type="button" onclick="removeField(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                                <div class="invalid-feedback "></div> <!-- Error message container -->
+
+                            </div>
+                        </div>
+    
+                        <!-- Add More Button Section (Centered) -->
+                        <div class="d-flex justify-content-center mb-4">
+                            <button type="button" class="btn btn-secondary btn-sm" id="addFieldBtn">+ Add More</button>
+                        </div>
+    
+                        <!-- Submit and Reset Button Section -->
+                        <div class="d-flex justify-content-between align-items-center pl-5 pr-5">
+                            <button type="reset" class="btn btn-warning">Clear</button>
+                            <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <span class="spinner-border spinner-border-sm" id="spinner" role="status" aria-hidden="true"></span>
+                                <span id="buttonText">Submit</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card shadow-sm p-4 mt-5">
+                    <p class="mb-4"><strong>Note: </strong>To Check the Status of the requested Agent IDs Please Click The Button Given Below</p>
+                    <div class="d-flex justify-content-center mb-4">
+                        <a href="check-password-status.html" type="button" class="btn btn-info" id="checkStatusPage">Check Status</a>
+                    </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ///////////////////////////////////// -->
+</div>
+<!-- include in every page -->
+<div id="footer"></div>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/script.js"></script>
+
+ <script src="assets/js/submit.js"></script>
+ <script>
+var userRoles = checkUserRole('dashboard', sessionToken, userRole);
+</script>
+</body>
+</html>

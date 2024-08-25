@@ -29,75 +29,7 @@
         }
         })
         .catch(error => console.error('Error fetching data:', error));
-
-        // Date picker funtionality start
-        $('#dateRange').daterangepicker({
-            singleDatePicker: false,
-            showDropdowns: true,
-            autoUpdateInput: false,
-            locale: {
-                format: 'DD-MM-YYYY',
-                cancelLabel: 'Clear',
-                applyLabel: 'Ok'
-            },
-            opens: 'left',
-            linkedCalendars: false,
-            startDate: moment(),
-            endDate: moment()
-        }, function(start, end) {
-            $('#dateRange').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
-            selectedDateRange = {
-                start: start.format('YYYY-MM-DD'),
-                end: end.format('YYYY-MM-DD')
-            };
-        });
-    
-        function resetDatePicker(picker) {
-            $('#dateRange').val('');
-            selectedDateRange = {
-                start: '',
-                end: ''
-            };
-            picker.setStartDate(moment());
-            picker.setEndDate(moment());
-            picker.updateView();
-    
-            const currentMonth = moment().month();
-            const currentYear = moment().year();
-    
-            const monthSelect = picker.container.find('.monthselect');
-            const yearSelect = picker.container.find('.yearselect');
-    
-            monthSelect.val(currentMonth).change();
-            yearSelect.val(currentYear).change();
-    
-            picker.hide();
-        }
-    
-        $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
-            resetDatePicker(picker);
-        });
-    
-        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
-            if ($(this).val() === '') {
-                $(this).val(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'));
-                selectedDateRange = {
-                    start: picker.startDate.format('YYYY-MM-DD'),
-                    end: picker.endDate.format('YYYY-MM-DD')
-                };
-            }
-        });
-        // Date picker funtionality End
-        // Reset filter form data start
-        $('#resetFilterForm').on('click', function() {
-            var picker = $('#dateRange').data('daterangepicker');
-            resetDatePicker(picker);
-            document.getElementById('filterForm').reset();
-        });
-        // Reset filter form data End
-    
-    //   });
-      // Audit List Data fetch End
+      //  List Data fetch End
     
       // Table shorting funtionality start
         let currentSortColumn = 'formatted_date';
@@ -122,8 +54,10 @@
                 if (dateA < dateB) return 1;
     
                 // If dates are the same, compare by agent id (largest to smallest)
-                const agentIdA = parseInt(a.agent_id.replace(/[A-Za-z]/g, ''), 10);
-                const agentIdB = parseInt(b.agent_id.replace(/[A-Za-z]/g, ''), 10);
+                // const agentIdA = parseInt(a.agent_id.replace(/[A-Za-z]/g, ''), 10);
+                // const agentIdB = parseInt(b.agent_id.replace(/[A-Za-z]/g, ''), 10);
+                const agentIdA = [a.agent_id].toString().toLowerCase();
+                const agentIdB = [b.agent_id].toString().toLowerCase();
                 
                 return agentIdB - agentIdA;
             });
@@ -144,8 +78,11 @@
             
                 if (column === 'agent_id') {
                     // Remove any alphabetic characters and parse as integer
-                    valA = parseInt(a[column].replace(/[A-Za-z]/g, ''), 10);
-                    valB = parseInt(b[column].replace(/[A-Za-z]/g, ''), 10);
+                    // valA = parseInt(a[column].replace(/[A-Za-z]/g, ''), 10);
+                    // valB = parseInt(b[column].replace(/[A-Za-z]/g, ''), 10);
+
+                valA = [a.agent_id].toString().toLowerCase();
+                valB = [b.agent_id].toString().toLowerCase();
                 } else if (column === 'formatted_date') {
                     // Convert to Date object for proper date comparison
                     valA = new Date(a[column]);
@@ -187,7 +124,7 @@
             const paginatedData = displayedData.slice(start, end);
     
             if (paginatedData.length === 0) {
-                $('#exportData').prop('disabled', true);
+                // $('#exportData').prop('disabled', true);
                 const row = document.createElement('tr');
                 const cell = document.createElement('td');
                 cell.colSpan = 16;
@@ -196,7 +133,7 @@
                 row.appendChild(cell);
                 tbody.appendChild(row);
             } else {
-                $('#exportData').prop('disabled', false);
+                // $('#exportData').prop('disabled', false);
                 paginatedData.forEach((item, index) => {
                     // console.log(typeof item.bca_id)
                     const row = document.createElement('tr');
@@ -599,42 +536,42 @@
           searchTable();
       });
     
-        $('#exportData').on('click', function() {
-          $('#exportData').prop('disabled', true);
+    //     $('#exportData').on('click', function() {
+    //       $('#exportData').prop('disabled', true);
     
-      if (filtersApplied) {
-        var status = $('#status').val();
-        // console.log(selectedDateRange.start);
-        var queryParams = [];
-        if (status) queryParams.push('status=' + encodeURIComponent(status));
+    //   if (filtersApplied) {
+    //     var status = $('#status').val();
+    //     // console.log(selectedDateRange.start);
+    //     var queryParams = [];
+    //     if (status) queryParams.push('status=' + encodeURIComponent(status));
     
-        var queryString = queryParams.length ? '?' + queryParams.join('&') : '';
-      } else {
-        console.log('Exporting data without filters');
-        var queryString = '';
-      }
+    //     var queryString = queryParams.length ? '?' + queryParams.join('&') : '';
+    //   } else {
+    //     console.log('Exporting data without filters');
+    //     var queryString = '';
+    //   }
         
-      const url = `exportData.php${queryString}`;
-        console.log("export button clicked");
+    //   const url = `exportData.php${queryString}`;
+    //     console.log("export button clicked");
     
-        // Open the URL in a new tab
-        const newTab = window.open(url, '_blank');
+    //     // Open the URL in a new tab
+    //     const newTab = window.open(url, '_blank');
     
-    // Check if the new tab was blocked
-    if (!newTab) {
-        alert('Please allow pop-ups for this website');
-        return;
-    }
+    // // Check if the new tab was blocked
+    // if (!newTab) {
+    //     alert('Please allow pop-ups for this website');
+    //     return;
+    // }
     
-    // Monitor the new tab to detect when it has been closed
-    const checkTabClosed = setInterval(() => {
-        if (newTab.closed) {
-            clearInterval(checkTabClosed);
-            console.log('CSV Download started successfully!');
-            $('#exportData').prop('disabled', false);
-        }
-    }, 500);
-    });
+    // // Monitor the new tab to detect when it has been closed
+    // const checkTabClosed = setInterval(() => {
+    //     if (newTab.closed) {
+    //         clearInterval(checkTabClosed);
+    //         console.log('CSV Download started successfully!');
+    //         $('#exportData').prop('disabled', false);
+    //     }
+    // }, 500);
+    // });
     
         // Search funtionality on rendered table data
         // function searchTable() {

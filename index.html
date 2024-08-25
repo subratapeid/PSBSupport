@@ -3,125 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css" />
-</head>
-<body>
-        <div class="login-container">
-            <h2>Login</h2>
-            <div class="error" id="error-message"></div>
-            <form id="loginForm">
-                <input type="text" id="email" placeholder="Email" />
-                <input type="password" id="password" placeholder="Password" />
+    <link rel="stylesheet" href="assets/css/loginForm.css" />
 
-                <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <span class="spinner-border spinner-border-sm" id="spinner" role="status" aria-hidden="true"></span>
-                    <span id="buttonText">Login</span>
-                </button>
-            </form>
-            </div>
+    <title>OTP Login System</title>
+    <script>
+        
+
+    </script>
+</head>
+<body class="d-flex justify-content-center align-items-center">
+    <div class="login-container">
+    <h2>User Login</h2>
+    <div class="error" id="error-message"></div>
+        <div id="loginForm">
+            <div id="loginForm">
+                <div id="informations">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter Full Name" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter Office Email" required>
+            <button type="submit" class="btn btn-secondary" id="sendOtpBtn" disabled>
+                <span class="spinner-border spinner-border-sm" id="sendSpinner" role="status" aria-hidden="true"></span>
+                <span id="sendButtonText">Send OTP</span>
+            </button>
+        </div>
+        <div id="otpArea" style = "display:none;">
+            <label for="otp">Validate OTP:</label>
+            <input type="text" id="otp" placeholder="Enter 6 Digit OTP" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '');" pattern="\d{6}" maxlength="6" disabled>
+            <button type="button" class="btn btn-secondary" id="validateOtpBtn" disabled>
+                <span class="spinner-border spinner-border-sm" id="validateSpinner" role="status" aria-hidden="true"></span>
+                <span id="validateButtonText">Validate OTP</span>
+            </button>
+        </div>
+    </div>        
+    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script>
-
-function setItems(name, value, days) {
-    const expiryDate = new Date();
-    expiryDate.setTime(expiryDate.getTime() + (days * 24 * 60 * 60 * 1000));
-    const itemData = {
-        value: value,
-        expiry: expiryDate.getTime()
-    };
-    localStorage.setItem(name, JSON.stringify(itemData));
-}
-
-function getItems(name) {
-    const itemData = localStorage.getItem(name);
-    if (itemData) {
-        try {
-            const parsedData = JSON.parse(itemData);
-            const now = new Date().getTime();
-            if (now < parsedData.expiry) {
-                return parsedData.value;
-            } else {
-                localStorage.removeItem(name); // Remove expired item
-            }
-        } catch (e) {
-            console.error("Error parsing JSON:", e);
-            return "";
-        }
-    }
-    return "";
-}
-
-// Check if the user is already logged in
-const sessionToken = getItems('sessionToken');
-const userRole = getItems('userRole');
-if (sessionToken && userRole) {
-    window.location.href = 'dashboard.html';     
-}
-
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    event.preventDefault();
-    
-    setItems('email', email, 365);  // Save for 1 year
-    setItems('password', password, 365);  // Save for 1 year
-
-    const endpointUrl = `https://script.google.com/macros/s/AKfycbw5_DWeGtUZ8rjVukvAddNRLbrXnEPovlC6FSyyIjSg1ova1YzJ0uX07pgniR29OGBlBA/exec?action=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
-
-    // Show spinner, change button text, and disable input
-    document.getElementById('spinner').style.display = 'inline-block';
-    document.getElementById('buttonText').textContent = 'verifying';
-    document.getElementById('email').disabled = true;
-    document.getElementById('password').disabled = true;
-    document.getElementById('loginBtn').disabled = true;
-
-    fetch(endpointUrl)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (data.success) {
-                history.replaceState(null, null, 'dashboard.html');
-                toastr.success(data.message);
-                setItems('sessionToken', data.sessionToken, 365);  // Save for 1 year
-                setItems('userRole', data.role, 365);  // Save for 1 year
-                window.location.href = 'dashboard.html';
-            } else{
-                toastr.error(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-            toastr.error('An error occurred while fetching data.');
-        })
-        .finally(() => {
-            // Hide spinner, revert button text, and enable input
-            document.getElementById('spinner').style.display = 'none';
-            document.getElementById('buttonText').textContent = 'Login';
-            document.getElementById('email').disabled = false;
-            document.getElementById('password').disabled = false;
-            document.getElementById('loginBtn').disabled = false;
-        });
-});
-
-// Load form data from localStorage
-function loadFormData() {
-    const email = getItems('email');
-    const password = getItems('password');
-    if (email) document.getElementById('email').value = email;
-    if (password) document.getElementById('password').value = password;
-}
-
-// Load data when the page loads
-window.onload = loadFormData;
-
-
-    </script>
+    <script src="assets/js/otpLogin.js"></script>
 </body>
 </html>
-

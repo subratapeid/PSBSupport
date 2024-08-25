@@ -1,3 +1,10 @@
+const sessionToken = localStorage.getItem('sessionToken');
+const userRole = localStorage.getItem('userRole');
+
+    if (sessionToken && userRole) {
+        window.location.href = 'dashboard.html';
+    }
+
 document.addEventListener('DOMContentLoaded', function () {
     const timer = 60;
     const nameField = document.getElementById('name');
@@ -139,9 +146,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if(data.userRole == 'Super Admin'){
                     window.location.href = 'dashboard.html';
                 }else if(data.userRole == 'Admin'){
-                    window.location.href = 'requested-password-reset-list.html';
+                    window.location.href = 'password-reset-list.html';
                 }else{
-                    window.location.href = 'request-password-reset.html';
+                    window.location.href = 'submit-request.html';
                     }
                 // alert("OTP verified successfully. You are logged in!");
                 toastr.success("OTP verified successfully. You are logged in!");
